@@ -1,4 +1,5 @@
 ## AUTOVC: Zero-Shot Voice Style Transfer with Only Autoencoder Loss
+### Modified by 22601 Casper Wang, 22625 Sean Liu @ CKHS 
 
 This repository provides a PyTorch implementation of AUTOVC.
 
