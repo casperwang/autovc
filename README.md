@@ -33,8 +33,11 @@ The audio demo for AUTOVC can be found [here](https://auspicious3000.github.io/a
 
 Download pre-trained AUTOVC model, and run the ```conversion.ipynb``` in the same directory.
 
-
 ### 1.Mel-Spectrograms to waveform
 
 Download pre-trained WaveNet Vocoder model, and run the ```vocoder.ipynb``` in the same the directory.
 
+## Modified Stuff
+
+### Dataset: 
+Chinese dataset taken from https://www.data-baker.com/open_source.html, about 12 hours of Mandarin Chinese spoken by the same woman.
