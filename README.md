@@ -41,3 +41,7 @@ Download pre-trained WaveNet Vocoder model, and run the ```vocoder.ipynb``` in t
 
 ### Dataset: 
 Chinese dataset taken from https://www.data-baker.com/open_source.html, about 12 hours of Mandarin Chinese spoken by the same woman.
+
+### Current Issues 
+
+Cannot do anything with CPU as laptops do not have GPU :(, keep on raising error: ```RuntimeError: Attempting to deserialize object on a CUDA device but torch.cuda.is_available() is False. If you are running on a CPU-only machine, please use torch.load with map_location=torch.device('cpu') to map your storages to the CPU.```, I've tried to modify whatever it tells me to do, but it seems to be to no avail :( 
