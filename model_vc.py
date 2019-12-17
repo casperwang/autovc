@@ -200,5 +200,3 @@ class Generator(nn.Module):
         mel_outputs_postnet = mel_outputs_postnet.unsqueeze(1)
         
         return mel_outputs, mel_outputs_postnet, torch.cat(codes, dim=-1)
-
-    
