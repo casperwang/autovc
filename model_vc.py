@@ -43,8 +43,8 @@ class Encoder(nn.Module):
     """
     def __init__(self, dim_neck, dim_emb, freq): #Set up 5x1 ConvNorm * 3 and BLSTM * 2
         super(Encoder, self).__init__()
-        self.dim_neck = dim_neck #What is dim_neck?
-        self.freq = freq #What is freq?
+        self.dim_neck = dim_neck #What is dim_neck? #irene: 這個參數用在61行，那個位置代表lstm的hidden size
+        self.freq = freq #What is freq? #irene: 參考paper 4.2，freq是downsampling/upsampling留下的timestamp
         
         convolutions = []
         for i in range(3):
