@@ -41,10 +41,10 @@ class ConvNorm(torch.nn.Module):
 class Encoder(nn.Module):
     """Encoder module:
     """
-    def __init__(self, dim_neck, dim_emb, freq):
+    def __init__(self, dim_neck, dim_emb, freq): #Set up 5x1 ConvNorm * 3 and BLSTM * 2
         super(Encoder, self).__init__()
-        self.dim_neck = dim_neck
-        self.freq = freq
+        self.dim_neck = dim_neck #What is dim_neck?
+        self.freq = freq #What is freq?
         
         convolutions = []
         for i in range(3):
@@ -54,29 +54,31 @@ class Encoder(nn.Module):
                          kernel_size=5, stride=1,
                          padding=2,
                          dilation=1, w_init_gain='relu'),
-                nn.BatchNorm1d(512))
+                nn.BatchNorm1d(512)) #Not so sure about what this is 
             convolutions.append(conv_layer)
-        self.convolutions = nn.ModuleList(convolutions)
+        self.convolutions = nn.ModuleList(convolutions) #Turns the list of Models into one big model I think
         
-        self.lstm = nn.LSTM(512, dim_neck, 2, batch_first=True, bidirectional=True)
+        self.lstm = nn.LSTM(512, dim_neck, 2, batch_first=True, bidirectional=True) #Adds BLSTM * 2 
 
-    def forward(self, x, c_org):
+    def forward(self, x, c_org): 
+		#what is x and c_org?
+		#What is the preprocessing on the 3 lines below for?
         x = x.squeeze(1).transpose(2,1)
         c_org = c_org.unsqueeze(-1).expand(-1, -1, x.size(-1))
         x = torch.cat((x, c_org), dim=1)
         
-        for conv in self.convolutions:
-            x = F.relu(conv(x))
-        x = x.transpose(1, 2)
+        for conv in self.convolutions: #Apply the convolutions to x
+            x = F.relu(conv(x)) #F: is from python.nn functional
+        x = x.transpose(1, 2) #why transpose?
         
         self.lstm.flatten_parameters()
-        outputs, _ = self.lstm(x)
+        outputs, _ = self.lstm(x) #What is _?
         out_forward = outputs[:, :, :self.dim_neck]
         out_backward = outputs[:, :, self.dim_neck:]
         
         codes = []
         for i in range(0, outputs.size(1), self.freq):
-            codes.append(torch.cat((out_forward[:,i+self.freq-1,:],out_backward[:,i,:]), dim=-1))
+            codes.append(torch.cat((out_forward[:,i+self.freq-1,:],out_backward[:,i,:]), dim=-1)) #???
 
         return codes
       
@@ -84,13 +86,14 @@ class Encoder(nn.Module):
 class Decoder(nn.Module):
     """Decoder module:
     """
-    def __init__(self, dim_neck, dim_emb, dim_pre):
+    def __init__(self, dim_neck, dim_emb, dim_pre): #dim_neck seems to be Down1 and Down2? dim_emb seems to be E_S, dim_neck looks to be E_C
+		#There should be Up1, Up2 and Copy (from the paper)
         super(Decoder, self).__init__()
         
-        self.lstm1 = nn.LSTM(dim_neck*2+dim_emb, dim_pre, 1, batch_first=True)
+        self.lstm1 = nn.LSTM(dim_neck*2+dim_emb, dim_pre, 1, batch_first=True) #Why is there an extra LSTM?
         
-        convolutions = []
-        for i in range(3):
+        convolutions = [] 
+        for i in range(3): # 5x1 ConvNorm * 3
             conv_layer = nn.Sequential(
                 ConvNorm(dim_pre,
                          dim_pre,
@@ -101,11 +104,12 @@ class Decoder(nn.Module):
             convolutions.append(conv_layer)
         self.convolutions = nn.ModuleList(convolutions)
         
-        self.lstm2 = nn.LSTM(dim_pre, 1024, 2, batch_first=True)
+        self.lstm2 = nn.LSTM(dim_pre, 1024, 2, batch_first=True) #only 2 LSTMs?
+		#The paper mentions a 1x1 Conv of size 80, four 5x1 ConvNorms with size 512, and a 5x1 ConvNorm with size 80. Where did they go :(
         
-        self.linear_projection = LinearNorm(1024, 80)
+        self.linear_projection = LinearNorm(1024, 80) #I assume this is the 5x1 ConvNorm? Or does this encompass the whole architecture mentioned on line 108?
 
-    def forward(self, x):
+    def forward(self, x): #I think it's run with input x, but there are supposed to be 3 inputs to the decoder, are they already concatenated beforehand?
         
         #self.lstm1.flatten_parameters()
         x, _ = self.lstm1(x)
@@ -171,7 +175,7 @@ class Postnet(nn.Module):
 
 class Generator(nn.Module):
     """Generator network."""
-    def __init__(self, dim_neck, dim_emb, dim_pre, freq):
+    def __init__(self, dim_neck, dim_emb, dim_pre, freq): #Meanings of parameters still unclear :(
         super(Generator, self).__init__()
         
         self.encoder = Encoder(dim_neck, dim_emb, freq)
