@@ -108,6 +108,7 @@ class Decoder(nn.Module):
         super(Decoder, self).__init__()
         
         self.lstm1 = nn.LSTM(dim_neck*2+dim_emb, dim_pre, 1, batch_first=True) #Why is there an extra LSTM?
+	#irene: 對應decoder裡面的第一個lstm，what do you mean extra?
         
         convolutions = [] 
         for i in range(3): # 5x1 ConvNorm * 3
@@ -123,11 +124,11 @@ class Decoder(nn.Module):
         
         self.lstm2 = nn.LSTM(dim_pre, 1024, 2, batch_first=True) #only 2 LSTMs?
 		#The paper mentions a 1x1 Conv of size 80, four 5x1 ConvNorms with size 512, and a 5x1 ConvNorm with size 80. Where did they go :(
-        
+        	#irene: postnet
         self.linear_projection = LinearNorm(1024, 80) #I assume this is the 5x1 ConvNorm? Or does this encompass the whole architecture mentioned on line 108?
-
+		#irene: yes
     def forward(self, x): #I think it's run with input x, but there are supposed to be 3 inputs to the decoder, are they already concatenated beforehand?
-        
+        #irene: yes, they are already concatenated before fed to decoder. you can see in conversion.ipynb
         #self.lstm1.flatten_parameters()
         x, _ = self.lstm1(x)
         x = x.transpose(1, 2)
@@ -193,6 +194,7 @@ class Postnet(nn.Module):
 class Generator(nn.Module):
     """Generator network."""
     def __init__(self, dim_neck, dim_emb, dim_pre, freq): #Meanings of parameters still unclear :(
+	#irene: the parameters for encoder and decoder, explained above
         super(Generator, self).__init__()
         
         self.encoder = Encoder(dim_neck, dim_emb, freq)
