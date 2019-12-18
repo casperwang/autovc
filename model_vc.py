@@ -128,7 +128,7 @@ class Decoder(nn.Module):
         self.linear_projection = LinearNorm(1024, 80) #I assume this is the 5x1 ConvNorm? Or does this encompass the whole architecture mentioned on line 108?
 		#irene: yes
     def forward(self, x): #I think it's run with input x, but there are supposed to be 3 inputs to the decoder, are they already concatenated beforehand?
-        #irene: yes, they are already concatenated before fed to decoder. you can see in conversion.ipynb
+        #irene: yes, they are already concatenated before fed to decoder. line 215
         #self.lstm1.flatten_parameters()
         x, _ = self.lstm1(x)
         x = x.transpose(1, 2)
