@@ -42,6 +42,7 @@ class Encoder(nn.Module):
     """Encoder module:
     """
     def __init__(self, dim_neck, dim_emb, freq): #Set up 5x1 ConvNorm * 3 and BLSTM * 2
+		#        What is dim_emb ?
         super(Encoder, self).__init__()
         self.dim_neck = dim_neck #What is dim_neck? #irene: 這個參數用在61行，那個位置代表lstm的hidden size
         self.freq = freq #What is freq? #irene: 參考paper 4.2，freq是downsampling/upsampling留下的取timestamp的frequency
@@ -59,6 +60,7 @@ class Encoder(nn.Module):
 		#       該batch的每一筆feature有一樣的scaling，如果feature因為scale差很多，對output的影響
 		#       不一樣，做backpropagation時算得的gradient會不同，造成訓練困難
 		#       詳細可以參考李宏毅老師的課程影片 https://www.youtube.com/watch?v=BZh1ltr5Rkg
+		# OK 已了解!
 		
 		
             convolutions.append(conv_layer)
@@ -70,6 +72,7 @@ class Encoder(nn.Module):
     def forward(self, x, c_org): 
 		#what is x and c_org?
 		#irene: 呼叫Encoder時，執行forward的input，encoder的input 要trace code找一下這兩個個別是什麼
+		# 可是Encoder.forward()感覺是我們要在train.py自己呼叫的function?
 		#What is the preprocessing on the 3 lines below for?
 		#irene: 前兩行基本上是把它變成吃進model的 dimension, pytorch是 BxCxHxW 
 		#       (B: batch size, C: channel, H: height, W: weight)
