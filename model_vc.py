@@ -44,7 +44,7 @@ class Encoder(nn.Module):
     def __init__(self, dim_neck, dim_emb, freq): #Set up 5x1 ConvNorm * 3 and BLSTM * 2
         super(Encoder, self).__init__()
         self.dim_neck = dim_neck #What is dim_neck? #irene: 這個參數用在61行，那個位置代表lstm的hidden size
-        self.freq = freq #What is freq? #irene: 參考paper 4.2，freq是downsampling/upsampling留下的timestamp
+        self.freq = freq #What is freq? #irene: 參考paper 4.2，freq是downsampling/upsampling留下的取timestamp的frequency
         
         convolutions = []
         for i in range(3):
@@ -54,31 +54,45 @@ class Encoder(nn.Module):
                          kernel_size=5, stride=1,
                          padding=2,
                          dilation=1, w_init_gain='relu'),
-                nn.BatchNorm1d(512)) #Not so sure about what this is 
+                nn.BatchNorm1d(512)) #Not so sure about what this is
+		#irene: 針對這次要訓練的batch做normalization，network中要加batchnorm的目的主要是要讓
+		#       該batch的每一筆feature有一樣的scaling，如果feature因為scale差很多，對output的影響
+		#       不一樣，做backpropagation時算得的gradient會不同，造成訓練困難
+		#       詳細可以參考李宏毅老師的課程影片 https://www.youtube.com/watch?v=BZh1ltr5Rkg
+		
+		
             convolutions.append(conv_layer)
-        self.convolutions = nn.ModuleList(convolutions) #Turns the list of Models into one big model I think
+        self.convolutions = nn.ModuleList(convolutions) #Turns the list of Models into one big model I think 
+	#irene: yes, 按照list裡的順序合成一個module
         
         self.lstm = nn.LSTM(512, dim_neck, 2, batch_first=True, bidirectional=True) #Adds BLSTM * 2 
 
     def forward(self, x, c_org): 
 		#what is x and c_org?
+		#irene: 呼叫Encoder時，執行forward的input，encoder的input 要trace code找一下這兩個個別是什麼
 		#What is the preprocessing on the 3 lines below for?
+		#irene: 前兩行基本上是把它變成吃進model的 dimension, pytorch是 BxCxHxW 
+		#       (B: batch size, C: channel, H: height, W: weight)
+		#       第三行是把這兩個input concatenate，變成真的input
         x = x.squeeze(1).transpose(2,1)
         c_org = c_org.unsqueeze(-1).expand(-1, -1, x.size(-1))
         x = torch.cat((x, c_org), dim=1)
         
         for conv in self.convolutions: #Apply the convolutions to x
-            x = F.relu(conv(x)) #F: is from python.nn functional
-        x = x.transpose(1, 2) #why transpose?
+            x = F.relu(conv(x)) #F: is from python.nn functional #irene: should be torch.nn.functional
+        x = x.transpose(1, 2) #why transpose? #irene: I guess transpose back to the original format, there is a transpose in line 77
         
         self.lstm.flatten_parameters()
-        outputs, _ = self.lstm(x) #What is _?
+        outputs, _ = self.lstm(x) #What is _? 
+	#irene: self.lstm will return 2 values, but you don't need the second one, 
+	# so you can use _ to represent immaterial variable
         out_forward = outputs[:, :, :self.dim_neck]
         out_backward = outputs[:, :, self.dim_neck:]
         
         codes = []
         for i in range(0, outputs.size(1), self.freq):
             codes.append(torch.cat((out_forward[:,i+self.freq-1,:],out_backward[:,i,:]), dim=-1)) #???
+	    # I think it is to combine the forward output and backward output of LSTM
 
         return codes
       
