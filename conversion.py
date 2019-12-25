@@ -18,7 +18,7 @@ def pad_seq(x, base=32):
     assert len_pad >= 0
     return np.pad(x, ((0,len_pad),(0,0)), 'constant'), len_pad
 
-device = 'cuda:0'
+device = 'cpu'
 G = Generator(32,256,512,32).eval().to(device)
 
 g_checkpoint = torch.load('autovc.ckpt') #AutoVC model weights
