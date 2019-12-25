@@ -8,7 +8,6 @@ import hparams_gen_melspec as hparams
 import os
 import glob
 from tqdm import tqdm
-def 
 wavs=['weichungstyle.wav']
 write_path='./'
 for wav_path in tqdm(wavs):
