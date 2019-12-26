@@ -72,7 +72,7 @@ def train(epochs): #TODO once data loader is complete
 			content_org = torch.cat(G.encoder(uttr_org, emb_org)) #It's a list of tensors 
 			content_trg = torch.cat(G.encoder(uttr_trg, emb_org))			
 
-			loss = criterion(uttr_trg, uttr_org, content_org, content_trg)
+			loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
 			loss.backward()
 			optimizer.step()
 			writer.add_scalar("Loss", loss.item(), total_it)
