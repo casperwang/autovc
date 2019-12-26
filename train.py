@@ -4,10 +4,11 @@ from math import ceil
 import torch
 import torch.optim as optim
 import model_vc as models
+from tqdm import tqdm
 import torch.functional as F
 import data_loader.dataLoader as data
 
-iters_per_epoch = 100
+iters_per_epoch = 10
 
 PATH = "./train_weights.ckpt" #To train
 device = "cpu"
@@ -29,7 +30,6 @@ def criterion(conv, ori, convcont, oricont): #TODO: Don't have L_recon0 yet, con
 		L_recon = np.linalg.norm(conv - ori)
 		L_recon = L_recon * L_recon #L_recon is norm squared
 		L_content = torch.dist(convcont, oricont) #This has to be a tensor lol
-		print("Finished lcontent")
 		return L_recon + L_content #lambda = 1
 
 def train(epochs): #TODO once data loader is complete
@@ -37,7 +37,7 @@ def train(epochs): #TODO once data loader is complete
 	datas = data.Dataset()
 	sz = datas.len()
 	for epoch in range(epochs):
-		for it in range(iters_per_epoch):
+		for it in tqdm(range(iters_per_epoch)):
 			total_it = total_it + 1
 			i = np.random.randint(0, sz)
 			j = np.random.randint(0, sz)
@@ -65,14 +65,13 @@ def train(epochs): #TODO once data loader is complete
 
 			uttr_trg = torch.from_numpy(uttr_trg[np.newaxis, :]).to(device).float()
 			
-			content_org = torch.cat(G.encoder(uttr_org, emb_org))
+			content_org = torch.cat(G.encoder(uttr_org, emb_org)) #It's a list of tensors 
 			content_trg = torch.cat(G.encoder(uttr_trg, emb_org))			
 
-			print(type(content_org))
 			loss = criterion(uttr_trg, uttr_org, content_org, content_trg)
 			loss.backward()
 			optimizer.step()
-		print("Epoch: " + epoch + ", loss = " + loss.item())
+		print("Epoch: " + (str)(epoch) + ", loss = " + (str)(loss.item()))
 		torch.save({
 			"epoch": epoch,
 			"model": G.state_dict(),
