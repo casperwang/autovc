@@ -77,6 +77,7 @@ class Encoder(nn.Module):
 		#irene: 前兩行基本上是把它變成吃進model的 dimension, pytorch是 BxCxHxW 
 		#       (B: batch size, C: channel, H: height, W: weight)
 		#       第三行是把這兩個input concatenate，變成真的input
+        print(x.shape)
         x = x.squeeze(1).transpose(2,1)
         c_org = c_org.unsqueeze(-1).expand(-1, -1, x.size(-1))
         x = torch.cat((x, c_org), dim=1)

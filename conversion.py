@@ -33,7 +33,7 @@ for sbmt_i in metadata:
     x_org, len_pad = pad_seq(x_org)
     
     uttr_org = torch.from_numpy(x_org[np.newaxis, :, :]).to(device)
-    print(type(sbmt_i[1]))
+    
     emb_org = torch.from_numpy(sbmt_i[1][np.newaxis, :]).to(device)
     
     
