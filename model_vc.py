@@ -99,14 +99,6 @@ class Encoder(nn.Module):
 	    # I think it is to combine the forward output and backward output of LSTM
 
         return codes
-
-class StyleEncoder(nn.Module): #TODO
-    def __init__(self, self, dim_neck, dim_emb, dim_pre):
-        super(StyleEncoder, self).__init__()
-        self.lstm = nn.LSTM(768, dim_neck, 2, batch_first=True, bidirectional=True)
-        self.fully_connected = nn.Linear(768, 256)
-    def forward(x, self):
-        
         
 class Decoder(nn.Module):
     """Decoder module:
