@@ -12,6 +12,7 @@ iters_per_epoch = 100
 PATH = "./train_weights.ckpt" #To train
 device = "cpu"
 G = Generator(32, 256, 512, 32).eval().to(device)
+G = G.float()
 
 g_checkpoint = torch.load("autovc.ckpt", map_location = torch.device(device)) #trainchk.ckpt is the file to train
 
@@ -41,15 +42,16 @@ def train(epochs): #TODO once data loader is complete
 			j = np.random.randint(0, sz)
 			while(i == j):
 				j = np.random.randint(0, sz)
+
 			datai = datas.get_item(i)
 			dataj = datas.get_item(j)
 
 			x_org = datai[2]
 			x_org, len_pad = pad_seq(x_org)
-			uttr_org =  torch.from_numpy(x_org[np.newaxis, :, :]).to(device)
+			uttr_org =  torch.from_numpy(x_org[np.newaxis, :, :]).to(device).float()
 			
-			emb_org = torch.from_numpy(datai[1][np.newaxis, :]).to(device)
-			emb_trg = torch.from_numpy(dataj[1][np.newaxis, :]).to(device)
+			emb_org = torch.from_numpy(datai[1][np.newaxis, :]).to(device).float()
+			emb_trg = torch.from_numpy(dataj[1][np.newaxis, :]).to(device).float()
 			#use i's content and j's style
 
 			with torch.no_grad():
@@ -59,6 +61,7 @@ def train(epochs): #TODO once data loader is complete
 				uttr_trg = mel_postnet[0, 0, :, :].cpu().numpy()
 			else:
 				uttr_trg = mel_postnet[0, 0, :-len_pad, :].cpu().numpy()
+
 			content_org = G.encoder(uttr_org, emb_org)
 			content_trg = G.encoder(uttr_trg, emb_org)
 
