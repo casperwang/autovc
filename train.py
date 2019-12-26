@@ -9,13 +9,12 @@ import data_loader.dataLoader as data
 
 iters_per_epoch = 100
 
-PATH = "./train_weights.ckpt"
+PATH = "./train_weights.ckpt" #To train
 device = "cpu"
 G = Generator(32, 256, 512, 32).eval().to(device)
 
 g_checkpoint = torch.load("autovc.ckpt", map_location = torch.device(device)) #trainchk.ckpt is the file to train
 
-G.load_state_dict(g_checkpoint["model"])
 optimizer = optim.Adam(G.parameters(), lr = 0.0001) #Not sure what the parameters do, just copying it
 
 
