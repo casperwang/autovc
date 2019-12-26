@@ -35,7 +35,7 @@ def build_model():
         upsample_scales=hparams.upsample_scales,
         freq_axis_kernel_size=hparams.freq_axis_kernel_size,
         scalar_input=True,
-        legacy=hparams.legacy,
+        #legacy=hparams.legacy,
     )
     return model
 
