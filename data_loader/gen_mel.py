@@ -11,7 +11,7 @@ from tqdm import tqdm
 wavs = []
 mels = []
 
-for i in range(1, 200):
+for i in range(1, 9994):
 	wavs.append('./BZNSYP.rar/Wave/'+str(i).zfill(6)+'.wav')
 
 write_path = './'
