@@ -5,7 +5,6 @@ import torch.optim as optim
 import model_vc as models
 import torch.functional as F
 import data_loader.dataLoader as datas
-model = sy.build_model()
 
 iters_per_epoch = 100
 
