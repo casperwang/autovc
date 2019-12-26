@@ -4,7 +4,7 @@ import torch
 import torch.optim as optim
 import model_vc as models
 import torch.functional as F
-import dataLoader as datas
+import data_loader.dataLoader as datas
 model = sy.build_model()
 
 iters_per_epoch = 100
@@ -16,7 +16,7 @@ G = Generator(32, 256, 512, 32).eval().to(device)
 g_checkpoint = torch.load("trainchk.ckpt", map_location = torch.device(device)) #trainchk.ckpt is the file to train
 
 G.load_state_dict(g_checkpoint["model"])
- optimizer = optim.Adam(G.parameters(), lr = 0.0001) #Not sure what the parameters do, just copying it
+optimizer = optim.Adam(G.parameters(), lr = 0.0001) #Not sure what the parameters do, just copying it
 
 
 def pad_seq(x, base = 32):
