@@ -1,6 +1,8 @@
 import numpy as np
 from model_vc import Generator
 from styleencoder import StyleEncoder
+import torch.autograd as autograd
+from torch.autograd import Variable
 from resemblyzer import VoiceEncoder, preprocess_wav
 from math import ceil
 from torch.utils.tensorboard import SummaryWriter
@@ -77,8 +79,11 @@ def train(epochs): #TODO once data loader is complete
 			else:
 				uttr_trg = mel_postnet[0, 0, :-len_pad, :].cpu().numpy()
 			uttr_trg = torch.from_numpy(uttr_trg[np.newaxis, :]).to(device).float()
-			content_org = torch.cat(G.encoder(uttr_org, emb_org)) #It's a list of tensors 
-			content_trg = torch.cat(G.encoder(uttr_trg, emb_org))			
+			content_org = Variable(torch.cat(G.encoder(uttr_org, emb_org)), requires_grad=True) #It's a list of tensors 
+			content_trg = Variable(torch.cat(G.encoder(uttr_trg, emb_org)), requires_grad=True)			
+
+			uttr_org = Variable(uttr_org, requires_grad=True)
+			uttr_trg = Variable(uttr_trg, requires_grad=True)
 
 			loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
 			loss.backward()
