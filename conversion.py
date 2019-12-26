@@ -21,7 +21,7 @@ def pad_seq(x, base=32):
 device = 'cpu'
 G = Generator(32,256,512,32).eval().to(device)
 
-g_checkpoint = torch.load('autovc.ckpt', map_location = torch.device('cpu')) #AutoVC model weights
+g_checkpoint = torch.load('train_weights.ckpt', map_location = torch.device('cpu')) #AutoVC model weights
 G.load_state_dict(g_checkpoint['model'])
 
 metadata = pickle.load(open('metadata.pkl', "rb"))

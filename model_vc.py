@@ -201,8 +201,10 @@ class Generator(nn.Module):
         self.decoder = Decoder(dim_neck, dim_emb, dim_pre)
         self.postnet = Postnet()
 
+
     def forward(self, x, c_org, c_trg):
-                
+    	#c_org = content original?  
+		#c_trg = target
         codes = self.encoder(x, c_org)
         if c_trg is None:
             return torch.cat(codes, dim=-1)
