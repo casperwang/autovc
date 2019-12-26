@@ -25,7 +25,7 @@ def pad_seq(x, base = 32):
 	assert len_pad >= 0
 	return np.pad(x, ((0, len_pad), (0, 0)), "constant"), len_pad
 
-def criterion(self, conv, ori, convcont, oricont): #TODO: Don't have L_recon0 yet, conv = converted
+def criterion(conv, ori, convcont, oricont): #TODO: Don't have L_recon0 yet, conv = converted
 		L_recon = np.linalg.norm(conv - ori)
 		L_recon = L_recon * L_recon #L_recon is norm squared
 		L_content = np.linalg.norm(convcont - oricont)
@@ -50,7 +50,6 @@ def train(epochs): #TODO once data loader is complete
 			
 			x_org, len_pad = pad_seq(x_org)
 			uttr_org =  torch.from_numpy(x_org[np.newaxis, :, :]).to(device).float()
-			print(uttr_org.shape)
 			emb_org = torch.from_numpy(datai[1][np.newaxis, :]).to(device).float()
 			emb_trg = torch.from_numpy(dataj[1][np.newaxis, :]).to(device).float()
 			#use i's content and j's style
@@ -65,8 +64,8 @@ def train(epochs): #TODO once data loader is complete
 
 			uttr_trg = torch.from_numpy(uttr_trg[np.newaxis, :]).to(device).float()
 			print(uttr_trg.shape)
-			content_org = G.encoder(uttr_org, emb_org)
-			content_trg = G.encoder(uttr_trg, emb_org)
+			content_org = array(G.encoder(uttr_org, emb_org))
+			content_trg = array(G.encoder(uttr_trg, emb_org))
 
 			loss = criterion(uttr_trg, uttr_org, content_org, content_trg)
 			loss.backward()
