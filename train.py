@@ -28,7 +28,8 @@ def pad_seq(x, base = 32):
 def criterion(conv, ori, convcont, oricont): #TODO: Don't have L_recon0 yet, conv = converted
 		L_recon = np.linalg.norm(conv - ori)
 		L_recon = L_recon * L_recon #L_recon is norm squared
-		L_content = np.linalg.norm(convcont - oricont)
+		L_content = torch.dist(convcont, oricont) #This has to be a tensor lol
+		print("Finished lcontent")
 		return L_recon + L_content #lambda = 1
 
 def train(epochs): #TODO once data loader is complete
@@ -63,10 +64,11 @@ def train(epochs): #TODO once data loader is complete
 				uttr_trg = mel_postnet[0, 0, :-len_pad, :].cpu().numpy()
 
 			uttr_trg = torch.from_numpy(uttr_trg[np.newaxis, :]).to(device).float()
-			print(uttr_trg.shape)
-			content_org = np.array(G.encoder(uttr_org, emb_org))
-			content_trg = np.array(G.encoder(uttr_trg, emb_org))
+			
+			content_org = torch.cat(G.encoder(uttr_org, emb_org))
+			content_trg = torch.cat(G.encoder(uttr_trg, emb_org))			
 
+			print(type(content_org))
 			loss = criterion(uttr_trg, uttr_org, content_org, content_trg)
 			loss.backward()
 			optimizer.step()
