@@ -1,6 +1,7 @@
 import numpy as np
 from model_vc import Generator
 from styleencoder import StyleEncoder
+from resemblyzer import VoiceEncoder, preprocess_wav
 from math import ceil
 from torch.utils.tensorboard import SummaryWriter
 import torch
@@ -31,7 +32,7 @@ def pad_seq(x, base = 32):
 	return np.pad(x, ((0, len_pad), (0, 0)), "constant"), len_pad
 
 def criterion(conv, ori, convcont, oricont): #TODO: Don't have L_recon0 yet, conv = converted
-		L_recon = np.linalg.norm(conv - ori)
+		L_recon = torch.dist(conv, ori)
 		L_recon = L_recon * L_recon #L_recon is norm squared
 		L_content = torch.dist(convcont, oricont) #This has to be a tensor lol
 		return L_recon + L_content #lambda = 1
@@ -71,7 +72,7 @@ def train(epochs): #TODO once data loader is complete
 			content_org = torch.cat(G.encoder(uttr_org, emb_org)) #It's a list of tensors 
 			content_trg = torch.cat(G.encoder(uttr_trg, emb_org))			
 
-			loss = criterion(uttr_trg, uttr_org, content_org, content_trg)
+			loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
 			loss.backward()
 			optimizer.step()
 			writer.add_scalar("Loss", loss.item(), total_it)
