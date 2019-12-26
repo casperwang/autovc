@@ -72,6 +72,8 @@ def train(epochs): #TODO once data loader is complete
 			"optimizer": optimizer.state_dict()
 		}, PATH)
 
+train(2)
+
 		#Load data -> zero gradients -> forward + backward + optimize -> perhaps print stats?
 		
 
