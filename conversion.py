@@ -21,7 +21,7 @@ def pad_seq(x, base=32):
 device = 'cpu'
 G = Generator(32,256,512,32).eval().to(device)
 
-g_checkpoint = torch.load('train_weights.ckpt', map_location = torch.device('cpu')) #AutoVC model weights
+g_checkpoint = torch.load('autovc.ckpt', map_location = torch.device('cpu')) #AutoVC model weights
 G.load_state_dict(g_checkpoint['model'])
 
 metadata = pickle.load(open('metadata.pkl', "rb"))
@@ -33,7 +33,7 @@ for sbmt_i in metadata:
     x_org, len_pad = pad_seq(x_org)
     
     uttr_org = torch.from_numpy(x_org[np.newaxis, :, :]).to(device)
-    
+    print(type(sbmt_i[1]))
     emb_org = torch.from_numpy(sbmt_i[1][np.newaxis, :]).to(device)
     
     
@@ -51,7 +51,7 @@ for sbmt_i in metadata:
         
         spect_vc.append( ('{}x{}'.format(sbmt_i[0], sbmt_j[0]), uttr_trg) )
     
-    
+
         
         
 with open('results.pkl', 'wb') as handle:
