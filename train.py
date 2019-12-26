@@ -1,5 +1,6 @@
 import numpy as np
 from model_vc import Generator
+from styleencoder import StyleEncoder
 from math import ceil
 import torch
 import torch.optim as optim
@@ -15,8 +16,8 @@ device = "cpu"
 G = Generator(32, 256, 512, 32).eval().to(device)
 G = G.float()
 
-g_checkpoint = torch.load("autovc.ckpt", map_location = torch.device(device)) #trainchk.ckpt is the file to train
-
+g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(device)) #the file to train
+#Will train from the same file every time, if you don't have yet make sure to just comment this out
 optimizer = optim.Adam(G.parameters(), lr = 0.0001) #Not sure what the parameters do, just copying it
 
 
@@ -33,6 +34,7 @@ def criterion(conv, ori, convcont, oricont): #TODO: Don't have L_recon0 yet, con
 		return L_recon + L_content #lambda = 1
 
 def train(epochs): #TODO once data loader is complete
+	#Load data -> zero gradients -> forward + backward + optimize -> perhaps print stats?
 	total_it = 0
 	datas = data.Dataset()
 	sz = datas.len()
@@ -78,14 +80,13 @@ def train(epochs): #TODO once data loader is complete
 			"optimizer": optimizer.state_dict()
 		}, PATH)
 
-train(2)
+train(2) #train(x) runs x epochs
 
-		#Load data -> zero gradients -> forward + backward + optimize -> perhaps print stats?
 		
 
 #TODO: 
 # 1. Data Loader - Wav File -> Turn into Mel-Spectrogram -> Turn Spectrogram into 
-#    1) init
+#    1) init 
 #	 2) getelemnt  
 # 2. Training: Connect the dots, add Loss function, see pytorch example for trainer 
 #    Build Model ->

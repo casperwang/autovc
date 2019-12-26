@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from speakerencoder import StyleEncoder
 
 
 class LinearNorm(torch.nn.Module):
@@ -200,10 +201,9 @@ class Generator(nn.Module):
         self.decoder = Decoder(dim_neck, dim_emb, dim_pre)
         self.postnet = Postnet()
 
-
     def forward(self, x, c_org, c_trg):
-    	#c_org = content original?  
-		#c_trg = target
+    	#c_org = style original?  
+		#c_trg = style
         codes = self.encoder(x, c_org)
         if c_trg is None:
             return torch.cat(codes, dim=-1)
