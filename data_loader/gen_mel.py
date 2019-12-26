@@ -8,11 +8,11 @@ import hparams_gen_melspec as hparams
 import os
 import glob
 from tqdm import tqdm
-wavs=['weichungstyle.wav']
-write_path='./'
+wavs = ['./weichungstyle.wav']
+write_path = './'
 for wav_path in tqdm(wavs):
 
-	basename=os.path.basename(wav_path).split('.wav')[0]
+	basename = os.path.basename(wav_path).split('.wav')[0]
 	wav = audio.load_wav(wav_path)
 	wav = wav / np.abs(wav).max() * hparams.hparams.rescaling_max
 
@@ -21,12 +21,11 @@ for wav_path in tqdm(wavs):
 	out_dtype = np.float32
 
 	mel_spectrogram = audio.melspectrogram(wav).astype(np.float32).T
-	print(mel_spectrogram)
-
+	print(mel_spectrogram.shape)
 
 	misc.imsave(os.path.join(write_path,basename+'.png'),mel_spectrogram)
 	mels=[]
 	mels.append((basename,mel_spectrogram))
 	with open(os.path.join(write_path,basename+'.pkl'),'wb') as handle:
-		pickle.dump(mels,handle)
+		pickle.dump(mels, handle)
 
