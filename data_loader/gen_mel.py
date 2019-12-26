@@ -11,7 +11,7 @@ from tqdm import tqdm
 wavs = []
 mels = []
 
-for i in range(1, 2000):
+for i in range(1, 3):
 	wavs.append('./BZNSYP.rar/Wave/'+str(i).zfill(6)+'.wav')
 
 write_path = './'
@@ -29,6 +29,6 @@ for wav_path in tqdm(wavs):
 
 	mels.append((basename,mel_spectrogram))
 
-with open(os.path.join(write_path,'BZNSYP.pkl'),'wb') as handle:
+with open(os.path.join(write_path,'test.pkl'),'wb') as handle:
 	pickle.dump(mels, handle)
 
