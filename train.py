@@ -64,9 +64,8 @@ def train(epochs): #TODO once data loader is complete
 				uttr_trg = mel_postnet[0, 0, :, :].cpu().numpy()
 			else:
 				uttr_trg = mel_postnet[0, 0, :-len_pad, :].cpu().numpy()
-
 			uttr_trg = torch.from_numpy(uttr_trg[np.newaxis, :]).to(device).float()
-			
+			print(shape(uttr_trg))
 			content_org = torch.cat(G.encoder(uttr_org, emb_org)) #It's a list of tensors 
 			content_trg = torch.cat(G.encoder(uttr_trg, emb_org))			
 
