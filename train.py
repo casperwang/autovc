@@ -1,6 +1,7 @@
 import numpy as np
 from model_vc import Generator
 from styleencoder import StyleEncoder
+from resemblyzer import VoiceEncoder, preprocess_wav
 from math import ceil
 from torch.utils.tensorboard import SummaryWriter
 import torch
@@ -32,7 +33,7 @@ def pad_seq(x, base = 32):
 	return np.pad(x, ((0, len_pad), (0, 0)), "constant"), len_pad
 
 def criterion(conv, ori, convcont, oricont): #TODO: Don't have L_recon0 yet, conv = converted
-		L_recon = np.linalg.norm(conv - ori)
+		L_recon = torch.dist(conv, ori)
 		L_recon = L_recon * L_recon #L_recon is norm squared
 		L_content = torch.dist(convcont, oricont) #This has to be a tensor lol
 		return L_recon + L_content #lambda = 1
