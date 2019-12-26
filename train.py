@@ -25,7 +25,7 @@ def pad_seq(x, base = 32):
 	assert len_pad >= 0
 	return np.pad(x, ((0, len_pad), (0, 0)), "constant"), len_pad
 
-def criterion(self, conv, ori, convcont, oricont): #TODO: Don't have L_recon0 yet, conv = converted
+def criterion(conv, ori, convcont, oricont): #TODO: Don't have L_recon0 yet, conv = converted
 		L_recon = np.linalg.norm(conv - ori)
 		L_recon = L_recon * L_recon #L_recon is norm squared
 		L_content = np.linalg.norm(convcont - oricont)
