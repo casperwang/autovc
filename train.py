@@ -2,6 +2,7 @@ import numpy as np
 from model_vc import Generator
 from styleencoder import StyleEncoder
 from math import ceil
+from torch.utils.tensorboard import SummaryWriter
 import torch
 import torch.optim as optim
 import model_vc as models
@@ -9,12 +10,14 @@ from tqdm import tqdm
 import torch.functional as F
 import data_loader.dataLoader as data
 
-iters_per_epoch = 10
+iters_per_epoch = 100
 
 PATH = "./train_weights.ckpt" #To train
 device = "cpu"
 G = Generator(32, 256, 512, 32).eval().to(device)
-G = G.float()
+G = G.float() #Turns all weights into float weights 
+writer = SummaryWriter()
+
 
 g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(device)) #the file to train
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
@@ -65,13 +68,13 @@ def train(epochs): #TODO once data loader is complete
 			else:
 				uttr_trg = mel_postnet[0, 0, :-len_pad, :].cpu().numpy()
 			uttr_trg = torch.from_numpy(uttr_trg[np.newaxis, :]).to(device).float()
-			print(shape(uttr_trg))
 			content_org = torch.cat(G.encoder(uttr_org, emb_org)) #It's a list of tensors 
 			content_trg = torch.cat(G.encoder(uttr_trg, emb_org))			
 
 			loss = criterion(uttr_trg, uttr_org, content_org, content_trg)
 			loss.backward()
 			optimizer.step()
+			writer.add_scalar("Loss", loss.item(), total_it)
 		print("Epoch: " + (str)(epoch) + ", loss = " + (str)(loss.item()))
 		torch.save({
 			"epoch": epoch,
