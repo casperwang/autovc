@@ -25,6 +25,17 @@ G.load_state_dict(g_checkpoint['model'])
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
 optimizer = optim.Adam(G.parameters(), lr = 0.1) #Not sure what the parameters do, just copying it
 
+class LossFunction(torch.nn.Module):
+	def __init__(self):
+		super(LossFunction, self).__init__()
+
+	def forward(self, conv, ori, convcont, oricont):
+		L_recon = torch.dist(conv, ori)
+		L_recon = L_recon * L_recon #L_recon is norm squared
+		L_content = torch.dist(convcont, oricont) #This has to be a tensor lol
+		return L_recon + L_content #lambda = 1
+
+criterion = LossFunction()
 
 def pad_seq(x, base = 32):
 	len_out = int(base * ceil(float(x.shape[0]) / base))
@@ -32,11 +43,7 @@ def pad_seq(x, base = 32):
 	assert len_pad >= 0
 	return np.pad(x, ((0, len_pad), (0, 0)), "constant"), len_pad
 
-def criterion(conv, ori, convcont, oricont): #TODO: Don't have L_recon0 yet, conv = converted
-		L_recon = torch.dist(conv, ori)
-		L_recon = L_recon * L_recon #L_recon is norm squared
-		L_content = torch.dist(convcont, oricont) #This has to be a tensor lol
-		return L_recon + L_content #lambda = 1
+		
 
 def train(epochs): #TODO once data loader is complete
 	#Load data -> zero gradients -> forward + backward + optimize -> perhaps print stats?
