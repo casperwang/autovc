@@ -8,7 +8,7 @@ from tqdm import tqdm
 import torch.functional as F
 import data_loader.dataLoader as data
 
-iters_per_epoch = 10
+iters_per_epoch = 100
 
 PATH = "./train_weights.ckpt" #To train
 device = "cpu"
@@ -78,7 +78,7 @@ def train(epochs): #TODO once data loader is complete
 			"optimizer": optimizer.state_dict()
 		}, PATH)
 
-train(2)
+train(1000)
 
 		#Load data -> zero gradients -> forward + backward + optimize -> perhaps print stats?
 		
