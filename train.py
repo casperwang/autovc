@@ -47,8 +47,11 @@ def train(epochs): #TODO once data loader is complete
 			dataj = datas.get_item(j)
 
 			x_org = datai[2]
+			
 			x_org, len_pad = pad_seq(x_org)
-			uttr_org =  torch.from_numpy(x_org[np.newaxis, :, :]).to(device).float()
+			
+			uttr_org = torch.from_numpy(x_org[np.newaxis, :, :]).to(device).float()
+			print(uttr_org.shape, " - uttr")
 			
 			emb_org = torch.from_numpy(datai[1][np.newaxis, :]).to(device).float()
 			emb_trg = torch.from_numpy(dataj[1][np.newaxis, :]).to(device).float()
