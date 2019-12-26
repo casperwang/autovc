@@ -64,8 +64,8 @@ def train(epochs): #TODO once data loader is complete
 
 			uttr_trg = torch.from_numpy(uttr_trg[np.newaxis, :]).to(device).float()
 			print(uttr_trg.shape)
-			content_org = array(G.encoder(uttr_org, emb_org))
-			content_trg = array(G.encoder(uttr_trg, emb_org))
+			content_org = np.array(G.encoder(uttr_org, emb_org))
+			content_trg = np.array(G.encoder(uttr_trg, emb_org))
 
 			loss = criterion(uttr_trg, uttr_org, content_org, content_trg)
 			loss.backward()
