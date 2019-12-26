@@ -8,6 +8,7 @@ import os
 import pickle
 import torch
 import numpy as np
+import data_loader.dataLoader as datas
 from math import ceil
 from model_vc import Generator
 
@@ -24,7 +25,8 @@ G = Generator(32,256,512,32).eval().to(device)
 g_checkpoint = torch.load('autovc.ckpt', map_location = torch.device('cpu')) #AutoVC model weights
 G.load_state_dict(g_checkpoint['model'])
 
-metadata = pickle.load(open('metadata.pkl', "rb"))
+data = datas.Dataset()
+metadata = [data.get_item(0)]
 
 spect_vc = []
 
@@ -32,14 +34,14 @@ for sbmt_i in metadata:
     x_org = sbmt_i[2]
     x_org, len_pad = pad_seq(x_org)
     
-    uttr_org = torch.from_numpy(x_org[np.newaxis, :, :]).to(device)
+    uttr_org = torch.from_numpy(x_org[np.newaxis, :, :]).to(device).float()
     
-    emb_org = torch.from_numpy(sbmt_i[1][np.newaxis, :]).to(device)
+    emb_org = torch.from_numpy(sbmt_i[1][np.newaxis, :]).to(device).float()
     
     
     for sbmt_j in metadata:
         
-        emb_trg = torch.from_numpy(sbmt_j[1][np.newaxis, :]).to(device)
+        emb_trg = torch.from_numpy(sbmt_j[1][np.newaxis, :]).to(device).float()
         
         with torch.no_grad():
             _, x_identic_psnt, _ = G(uttr_org, emb_org, emb_trg)
@@ -50,12 +52,9 @@ for sbmt_i in metadata:
             uttr_trg = x_identic_psnt[0, 0, :-len_pad, :].cpu().numpy()
         
         spect_vc.append( ('{}x{}'.format(sbmt_i[0], sbmt_j[0]), uttr_trg) )
-    
 
-        
-        
 with open('results.pkl', 'wb') as handle:
-    pickle.dump(spect_vc, handle)          
+    pickle.dump(spect_vc, handle)
 
 
 
