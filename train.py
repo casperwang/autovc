@@ -49,7 +49,7 @@ def train(epochs): #TODO once data loader is complete
 			x_org = datai[2]
 			x_org, len_pad = pad_seq(x_org)
 			uttr_org =  torch.from_numpy(x_org[np.newaxis, :, :]).to(device).float()
-			
+			print(uttr_org.shape)
 			emb_org = torch.from_numpy(datai[1][np.newaxis, :]).to(device).float()
 			emb_trg = torch.from_numpy(dataj[1][np.newaxis, :]).to(device).float()
 			#use i's content and j's style
@@ -62,6 +62,8 @@ def train(epochs): #TODO once data loader is complete
 			else:
 				uttr_trg = mel_postnet[0, 0, :-len_pad, :].cpu().numpy()
 
+			uttr_trg = torch.from_numpy(uttr_trg[np.newaxis, :]).to(device).float()
+			print(uttr_trg.shape)
 			content_org = G.encoder(uttr_org, emb_org)
 			content_trg = G.encoder(uttr_trg, emb_org)
 
