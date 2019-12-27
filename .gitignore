@@ -1,9 +1,6 @@
 /data_loader/BZNSYP.rar
-
-/data_loader/BZNSYP.pkl
-
+/data_loader/test.pkl
 autovc.ckpt
-
 checkpoint_step001000000_ema.pth
 __pycache__/model_vc.cpython-36.pyc
 data_loader/__pycache__/dataLoader.cpython-36.pyc

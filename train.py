@@ -20,12 +20,11 @@ device = "cpu"
 G = Generator(32, 256, 512, 32).eval().to(device)
 G = G.float() #Turns all weights into float weights
 
-doWrite = False #Turns on and off writing to TensorBoard
+doWrite = True #Turns on and off writing to TensorBoard
 
 writer = SummaryWriter()
 
-
-g_checkpoint = torch.load("./autovc.ckpt", map_location = torch.device(device)) #the file to train
+g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(device)) #the file to train
 G.load_state_dict(g_checkpoint['model'])
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
 optimizer = optim.Adam(G.parameters(), lr = 0.0001) #Not sure what the parameters do, just copying it
@@ -55,6 +54,7 @@ def train(epochs): #TODO once data loader is complete
 	total_it = 0
 	datas = data.Dataset()
 	sz = datas.len()
+	print("dataset size : ", sz)
 	for epoch in range(epochs):
 		for it in tqdm(range(iters_per_epoch)):
 			total_it = total_it + 1
@@ -91,9 +91,9 @@ def train(epochs): #TODO once data loader is complete
 			loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
 			loss.backward()
 			optimizer.step()
-			if(doWrite == True)
+			if(doWrite == True):
 				writer.add_scalar("Loss", loss.item(), total_it)
-				
+
 		print("Epoch: " + (str)(epoch) + ", loss = " + (str)(loss.item()))
 		torch.save({
 			"epoch": epoch,
