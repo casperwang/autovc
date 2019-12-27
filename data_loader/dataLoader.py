@@ -12,7 +12,9 @@ class Dataset:
         tmp[0] = 1
         item.append(tmp)
         item.append(preprocessing.scale(np.resize(self.wav_folder[index][1], (256, 80)).astype('float64')))
-        print(item[2])
+        # item[0] 人名 : p001(用來train的data)
+        # item[1] Style : 還沒有 Style encoder
+        # item[2] melspectrogram : 256*80 的.wav頻譜圖
         return item
     def len(self):
         return len(self.wav_folder)
