@@ -35,9 +35,9 @@ class LossFunction(torch.nn.Module):
 		super(LossFunction, self).__init__()
 
 	def forward(self, conv, ori, convcont, oricont):
-		L_recon = torch.dist(conv, ori)
+		L_recon = torch.nn.MSELoss(conv, ori)
 		L_recon = L_recon * L_recon #L_recon is norm squared
-		L_content = torch.dist(convcont, oricont) #This has to be a tensor lol
+		L_content = torch.nn.MSELoss(convcont, oricont) #This has to be a tensor lol
 		return L_recon + L_content #lambda = 1
 
 criterion = LossFunction()
@@ -91,7 +91,7 @@ def train(epochs): #TODO once data loader is complete
 			loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
 			loss.backward()
 			optimizer.step()
-			if(doWrite == True)
+			if(doWrite == True):
 				writer.add_scalar("Loss", loss.item(), total_it)
 				
 		print("Epoch: " + (str)(epoch) + ", loss = " + (str)(loss.item()))
