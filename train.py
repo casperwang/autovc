@@ -34,9 +34,9 @@ class LossFunction(torch.nn.Module):
 		super(LossFunction, self).__init__()
 
 	def forward(self, conv, ori, convcont, oricont):
-		L_recon = torch.nn.MSELoss(conv, ori)
+		L_recon = torch.dist(conv, ori)
 		L_recon = L_recon * L_recon #L_recon is norm squared
-		L_content = torch.nn.MSELoss(convcont, oricont) #This has to be a tensor lol
+		L_content = torch.dist(convcont, oricont) #This has to be a tensor lol
 		return L_recon + L_content #lambda = 1
 
 criterion = LossFunction()
