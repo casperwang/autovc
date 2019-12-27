@@ -27,16 +27,16 @@ writer = SummaryWriter()
 g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(device)) #the file to train
 G.load_state_dict(g_checkpoint['model'])
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
-optimizer = optim.Adam(G.parameters(), lr = 0.0001) #Not sure what the parameters do, just copying it
+optimizer = optim.Adam(G.parameters(), lr = 0.01) #Not sure what the parameters do, just copying it
 
 class LossFunction(torch.nn.Module):
 	def __init__(self):
 		super(LossFunction, self).__init__()
 
 	def forward(self, conv, ori, convcont, oricont):
-		L_recon = torch.dist(conv, ori)
+		L_recon = torch.norm(conv - ori)
 		L_recon = L_recon * L_recon #L_recon is norm squared
-		L_content = torch.dist(convcont, oricont) #This has to be a tensor lol
+		L_content = torch.norm(convcont - oricont) #This has to be a tensor lol
 		return L_recon + L_content #lambda = 1
 
 criterion = LossFunction()
@@ -89,6 +89,7 @@ def train(epochs): #TODO once data loader is complete
 			uttr_trg = Variable(uttr_trg, requires_grad=True)
 
 			loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
+			optimizer.zero_grad()
 			loss.backward()
 			optimizer.step()
 			if(doWrite == True):
