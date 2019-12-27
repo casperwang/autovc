@@ -18,7 +18,10 @@ iters_per_epoch = 100
 PATH = "./train_weights.ckpt" #To train
 device = "cpu"
 G = Generator(32, 256, 512, 32).eval().to(device)
-G = G.float() #Turns all weights into float weights 
+G = G.float() #Turns all weights into float weights
+
+doWrite = False #Turns on and off writing to TensorBoard
+
 writer = SummaryWriter()
 
 
@@ -88,7 +91,9 @@ def train(epochs): #TODO once data loader is complete
 			loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
 			loss.backward()
 			optimizer.step()
-			writer.add_scalar("Loss", loss.item(), total_it)
+			if(doWrite == True)
+				writer.add_scalar("Loss", loss.item(), total_it)
+				
 		print("Epoch: " + (str)(epoch) + ", loss = " + (str)(loss.item()))
 		torch.save({
 			"epoch": epoch,
