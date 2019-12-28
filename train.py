@@ -16,6 +16,7 @@ import data_loader.dataLoader as data
 iters_per_epoch = 100
 
 PATH = "./train_weights.ckpt" #To train
+device = 'cpu'
 G = Generator(64, 256, 512, 32).eval().to(device)
 G = G.float() #Turns all weights into float weights
 
@@ -24,7 +25,7 @@ doWrite = True #Turns on and off writing to TensorBoard
 writer = SummaryWriter()
 
 g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(device)) #the file to train
-# G.load_state_dict(g_checkpoint['model'])
+G.load_state_dict(g_checkpoint['model'])
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
 optimizer = optim.RMSprop(G.parameters(), lr = 0.001) #Not sure what the parameters do, just copying it
 # optimizer.load_state_dict(g_checkpoint['optimizer'])
@@ -75,35 +76,36 @@ def train(epochs): #TODO once data loader is complete
 			emb_trg = torch.from_numpy(dataj[1][np.newaxis, :]).to(device).float()
 			#use i's content and j's style
 
-			#with torch.no_grad():
-			mels, mel_postnet, codes = G(uttr_org, emb_org, emb_trg)
+			with torch.no_grad():
+				mels, mel_postnet, _ = G(uttr_org, emb_org, emb_trg)
 			
-			if len_pad == 0:
-				uttr_trg = mel_postnet[0, 0, :, :].cpu().numpy()
-			else:
-				uttr_trg = mel_postnet[0, 0, :-len_pad, :].cpu().numpy()
+			uttr_trg  = mel_postnet[0, 0, :, :].cpu().numpy()
+			uttr_trg0 = mels[0, 0, :, :].cpu().numpy()
 
-			uttr_trg = torch.from_numpy(uttr_trg[np.newaxis, :]).to(device).float()
+			uttr_trg  = torch.from_numpy( uttr_trg[np.newaxis, :]).to(device).float()
+			uttr_trg0 = torch.from_numpy(uttr_trg0[np.newaxis, :]).to(device).float()
 			content_org = Variable(torch.cat(G.encoder(uttr_org, emb_org)), requires_grad=True) #It's a list of tensors 
 			content_trg = Variable(torch.cat(G.encoder(uttr_trg, emb_org)), requires_grad=True)		
 
-			uttr_org = Variable(uttr_org, requires_grad=True)
-			uttr_trg = Variable(uttr_trg, requires_grad=True)
+			uttr_org  = Variable(uttr_org , requires_grad=True)
+			uttr_trg  = Variable(uttr_trg , requires_grad=True)
+			uttr_trg0 = Variable(uttr_trg0, requires_grad=True)
 
 			optimizer.zero_grad()
 
 			lossutt = criterion(uttr_org, uttr_trg)
+			lossutt0 = criterion(uttr_org, uttr_trg0)
 			losscont = criterion(content_org, content_trg)
 
 			#loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
-			loss = lossutt + losscont
+			loss = lossutt
 			
 			loss.backward()
 			optimizer.step()
 			if(doWrite == True):
 				writer.add_scalar("Loss", loss.item(), total_it)
 
-			running_loss += loss.item
+			running_loss += loss.item()
 
 		print("Epoch: " + (str)(epoch) + ", avg loss = " + (str)(running_loss / iters_per_epoch))
 		torch.save({
