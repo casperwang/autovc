@@ -27,7 +27,7 @@ writer = SummaryWriter()
 g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(device)) #the file to train
 G.load_state_dict(g_checkpoint['model'])
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
-optimizer = optim.RMSprop(G.parameters(), lr = 0.001) #Not sure what the parameters do, just copying it
+optimizer = optim.RMSprop(G.parameters(), lr = 0.1) #Not sure what the parameters do, just copying it
 # optimizer.load_state_dict(g_checkpoint['optimizer'])
 
 class LossFunction(torch.nn.Module):
@@ -70,20 +70,19 @@ def train(epochs): #TODO once data loader is complete
 
 			x_org = datai[2]
 			
-			x_org, len_pad = pad_seq(x_org)
+			x_org, _ = pad_seq(x_org)
 			uttr_org =  torch.from_numpy(x_org[np.newaxis, :, :]).to(device).float()
 			emb_org = torch.from_numpy(datai[1][np.newaxis, :]).to(device).float()
 			emb_trg = torch.from_numpy(dataj[1][np.newaxis, :]).to(device).float()
 			#use i's content and j's style
 
-			with torch.no_grad():
-				mels, mel_postnet, _ = G(uttr_org, emb_org, emb_trg)
+			mels, mel_postnet, _ = G(uttr_org, emb_org, emb_trg)
 			
-			uttr_trg  = mel_postnet[0, 0, :, :].cpu().numpy()
-			uttr_trg0 = mels[0, 0, :, :].cpu().numpy()
+			uttr_trg  = mel_postnet[0, 0, :, :].cpu()
+			uttr_trg0 = mels[0, 0, :, :].cpu()
 
-			uttr_trg  = torch.from_numpy( uttr_trg[np.newaxis, :]).to(device).float()
-			uttr_trg0 = torch.from_numpy(uttr_trg0[np.newaxis, :]).to(device).float()
+			uttr_trg  = uttr_trg[np.newaxis, :].to(device).float()
+			uttr_trg0 = uttr_trg0[np.newaxis, :].to(device).float()
 			content_org = Variable(torch.cat(G.encoder(uttr_org, emb_org)), requires_grad=True) #It's a list of tensors 
 			content_trg = Variable(torch.cat(G.encoder(uttr_trg, emb_org)), requires_grad=True)		
 
