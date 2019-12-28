@@ -6,3 +6,4 @@ __pycache__/model_vc.cpython-36.pyc
 data_loader/__pycache__/dataLoader.cpython-36.pyc
 train_weights.ckpt
 *.pyc
+/runs
