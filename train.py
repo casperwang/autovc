@@ -17,7 +17,7 @@ iters_per_epoch = 100
 
 PATH = "./train_weights.ckpt" #To train
 device = "cpu"
-G = Generator(32, 256, 512, 32).eval().to(device)
+G = Generator(32, 256, 512, 32).train().to(device)
 G = G.float() #Turns all weights into float weights
 
 doWrite = False #Turns on and off writing to TensorBoard
@@ -76,13 +76,14 @@ def train(epochs): #TODO once data loader is complete
 			emb_trg = torch.from_numpy(dataj[1][np.newaxis, :]).to(device).float()
 			#use i's content and j's style
 
-			with torch.no_grad():
-				mels, mel_postnet, codes = G(uttr_org, emb_org, emb_trg)
+			#with torch.no_grad():
+			mels, mel_postnet, codes = G(uttr_org, emb_org, emb_trg)
 			
 			if len_pad == 0:
 				uttr_trg = mel_postnet[0, 0, :, :].cpu().numpy()
 			else:
 				uttr_trg = mel_postnet[0, 0, :-len_pad, :].cpu().numpy()
+			
 			uttr_trg = torch.from_numpy(uttr_trg[np.newaxis, :]).to(device).float()
 			content_org = Variable(torch.cat(G.encoder(uttr_org, emb_org)), requires_grad=True) #It's a list of tensors 
 			content_trg = Variable(torch.cat(G.encoder(uttr_trg, emb_org)), requires_grad=True)			
