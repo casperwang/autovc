@@ -40,7 +40,7 @@ class LossFunction(torch.nn.Module):
 		L_content = torch.norm(convcont - oricont) #This has to be a tensor lol
 		return L_recon + L_content #lambda = 1
 
-criterion = LossFunction()
+criterion = torch.nn.MSELoss()
 
 def pad_seq(x, base = 32):
 	len_out = int(base * ceil(float(x.shape[0]) / base))
@@ -92,8 +92,8 @@ def train(epochs): #TODO once data loader is complete
 
 			optimizer.zero_grad()
 
-			lossutt = torch.nn.MSELoss(uttr_org, uttr_trg)
-			losscont = torch.nn.MSELoss(content_org, content_trg)
+			lossutt = criterion(uttr_org, uttr_trg)
+			losscont = criterion(content_org, content_trg)
 
 			#loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
 			loss = lossutt + losscont
