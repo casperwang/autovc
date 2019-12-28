@@ -25,7 +25,7 @@ doWrite = True #Turns on and off writing to TensorBoard
 writer = SummaryWriter()
 
 g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(device)) #the file to train
-G.load_state_dict(g_checkpoint['model'])
+# G.load_state_dict(g_checkpoint['model'])
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
 optimizer = optim.RMSprop(G.parameters(), lr = 0.001) #Not sure what the parameters do, just copying it
 # optimizer.load_state_dict(g_checkpoint['optimizer'])
