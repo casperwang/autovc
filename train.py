@@ -17,17 +17,17 @@ iters_per_epoch = 100
 
 PATH = "./train_weights.ckpt" #To train
 device = "cpu"
-G = Generator(32, 256, 512, 32).eval().to(device)
+G = Generator(64, 256, 512, 32).eval().to(device)
 G = G.float() #Turns all weights into float weights
 
-doWrite = False #Turns on and off writing to TensorBoard
+doWrite = True #Turns on and off writing to TensorBoard
 
 writer = SummaryWriter()
 
 g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(device)) #the file to train
 G.load_state_dict(g_checkpoint['model'])
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
-optimizer = optim.RMSprop(G.parameters(), lr = 0.0001) #Not sure what the parameters do, just copying it
+optimizer = optim.RMSprop(G.parameters(), lr = 0.001) #Not sure what the parameters do, just copying it
 # optimizer.load_state_dict(g_checkpoint['optimizer'])
 
 class LossFunction(torch.nn.Module):
@@ -82,13 +82,13 @@ def train(epochs): #TODO once data loader is complete
 				uttr_trg = mel_postnet[0, 0, :, :].cpu().numpy()
 			else:
 				uttr_trg = mel_postnet[0, 0, :-len_pad, :].cpu().numpy()
+				
 			uttr_trg = torch.from_numpy(uttr_trg[np.newaxis, :]).to(device).float()
 			content_org = Variable(torch.cat(G.encoder(uttr_org, emb_org)), requires_grad=True) #It's a list of tensors 
-			content_trg = Variable(torch.cat(G.encoder(uttr_trg, emb_org)), requires_grad=True)			
+			content_trg = Variable(torch.cat(G.encoder(uttr_trg, emb_org)), requires_grad=True)		
 
 			uttr_org = Variable(uttr_org, requires_grad=True)
 			uttr_trg = Variable(uttr_trg, requires_grad=True)
-
 
 			optimizer.zero_grad()
 
