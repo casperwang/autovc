@@ -20,7 +20,7 @@ device = "cpu"
 G = Generator(32, 256, 512, 32).eval().to(device)
 G = G.float() #Turns all weights into float weights
 
-doWrite = True #Turns on and off writing to TensorBoard
+doWrite = False #Turns on and off writing to TensorBoard
 
 writer = SummaryWriter()
 
@@ -89,8 +89,15 @@ def train(epochs): #TODO once data loader is complete
 			uttr_org = Variable(uttr_org, requires_grad=True)
 			uttr_trg = Variable(uttr_trg, requires_grad=True)
 
-			loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
+
 			optimizer.zero_grad()
+
+			lossutt = torch.nn.MSELoss(uttr_org, uttr_trg)
+			losscont = torch.nn.MSELoss(content_org, content_trg)
+
+			#loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
+			loss = lossutt + losscont
+			
 			loss.backward()
 			optimizer.step()
 			if(doWrite == True):
