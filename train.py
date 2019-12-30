@@ -14,11 +14,15 @@ import torch.functional as F
 import data_loader.dataLoader as data
 
 iters_per_epoch = 100
+learning_rate = 0.001
 
 PATH = "./train_weights.ckpt" #To train
 device = 'cpu'
 G = Generator(64, 256, 512, 32).eval().to(device)
 G = G.float() #Turns all weights into float weights
+
+
+lmbda = 1, mu = 1
 
 doWrite = True #Turns on and off writing to TensorBoard
 
@@ -27,20 +31,38 @@ writer = SummaryWriter()
 g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(device)) #the file to train
 G.load_state_dict(g_checkpoint['model'])
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
-optimizer = optim.RMSprop(G.parameters(), lr = 0.1) #Not sure what the parameters do, just copying it
+optimizer = optim.Adam(G.parameters(), lr = learning_rate) #Not sure what the parameters do, just copying it
 # optimizer.load_state_dict(g_checkpoint['optimizer'])
 
-class LossFunction(torch.nn.Module):
+class L_Recon(torch.nn.Module):
 	def __init__(self):
 		super(LossFunction, self).__init__()
 
-	def forward(self, conv, ori, convcont, oricont):
-		L_recon = torch.norm(conv - ori)
+	def forward(self, conv, ori):
+		L_recon = torch.norm(conv - ori, 2)
 		L_recon = L_recon * L_recon #L_recon is norm squared
-		L_content = torch.norm(convcont - oricont) #This has to be a tensor lol
-		return L_recon + L_content #lambda = 1
+		return L_recon #lambda = 1
 
-criterion = torch.nn.MSELoss()
+class L_Content(torch.nn.Module):
+	def __init__(self):
+		super(LossFunction, self).__init__()
+
+	def forward(self, convcont, oricont):
+		L_content = torch.norm(convcont - oricont, 1) #This has to be a tensor lol
+		return L_content #lambda = 1
+
+class L_Recon0(torch.nn.Module):
+	def __init__(self):
+		super(LossFunction, self).__init__()
+
+	def forward(self, oriuttr, tgtuttr):
+		L_recon0 = torch.norm(oriuttr - tgtuttr, 1) #This has to be a tensor lol
+		return L_content #lambda = 1
+
+
+lrecon = L_Recon()
+lcontent = L_Content()
+lrecon0 = L_Recon0()
 
 def pad_seq(x, base = 32):
 	len_out = int(base * ceil(float(x.shape[0]) / base))
@@ -93,12 +115,12 @@ def train(epochs): #TODO once data loader is complete
 
 			optimizer.zero_grad()
 
-			lossutt = criterion(uttr_org, uttr_trg)
-			lossutt0 = criterion(uttr_org, uttr_trg0)
-			losscont = criterion(content_org, content_trg)
+			l_recon = lrecon(uttr_org, uttr_trg)
+			l_content = lcontent(content_org, content_trg)
+			l_recon0 = lrecon0(uttr_trg, uttr_trg0);
 
 			#loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
-			loss = lossutt
+			loss = l_recon + l_content * lmbda + l_recon0 * mu;
 			
 			loss.backward()
 			optimizer.step()
