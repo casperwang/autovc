@@ -40,7 +40,7 @@ class L_Recon(torch.nn.Module):
 		super(L_Recon, self).__init__()
 
 	def forward(self, conv, ori):
-		L_recon = torch.norm(conv - ori, 2)
+		L_recon = torch.MSELoss(conv, ori)
 		L_recon = L_recon * L_recon #L_recon is norm squared
 		return L_recon #lambda = 1
 
@@ -49,7 +49,7 @@ class L_Content(torch.nn.Module):
 		super(L_Content, self).__init__()
 
 	def forward(self, convcont, oricont):
-		L_content = torch.norm(convcont - oricont, 1) #This has to be a tensor lol
+		L_content = torch.L1Loss(convcont, oricont) #This has to be a tensor lol
 		return L_content #lambda = 1
 
 class L_Recon0(torch.nn.Module):
@@ -57,7 +57,7 @@ class L_Recon0(torch.nn.Module):
 		super(L_Recon0, self).__init__()
 
 	def forward(self, oriuttr, tgtuttr):
-		L_recon0 = torch.norm(oriuttr - tgtuttr, 1) #This has to be a tensor lol
+		L_recon0 = torch.MSELoss(oriuttr, tgtuttr) #This has to be a tensor lol
 		return L_recon0 #lambda = 1
 
 
