@@ -22,7 +22,8 @@ G = Generator(64, 256, 512, 32).eval().to(device)
 G = G.float() #Turns all weights into float weights
 
 
-lmbda = 1, mu = 1
+lmb = 1
+mu = 1
 
 doWrite = True #Turns on and off writing to TensorBoard
 
@@ -36,7 +37,7 @@ optimizer = optim.Adam(G.parameters(), lr = learning_rate) #Not sure what the pa
 
 class L_Recon(torch.nn.Module):
 	def __init__(self):
-		super(LossFunction, self).__init__()
+		super(L_Recon, self).__init__()
 
 	def forward(self, conv, ori):
 		L_recon = torch.norm(conv - ori, 2)
@@ -45,7 +46,7 @@ class L_Recon(torch.nn.Module):
 
 class L_Content(torch.nn.Module):
 	def __init__(self):
-		super(LossFunction, self).__init__()
+		super(L_Content, self).__init__()
 
 	def forward(self, convcont, oricont):
 		L_content = torch.norm(convcont - oricont, 1) #This has to be a tensor lol
@@ -53,11 +54,11 @@ class L_Content(torch.nn.Module):
 
 class L_Recon0(torch.nn.Module):
 	def __init__(self):
-		super(LossFunction, self).__init__()
+		super(L_Recon0, self).__init__()
 
 	def forward(self, oriuttr, tgtuttr):
 		L_recon0 = torch.norm(oriuttr - tgtuttr, 1) #This has to be a tensor lol
-		return L_content #lambda = 1
+		return L_recon0 #lambda = 1
 
 
 lrecon = L_Recon()
@@ -93,9 +94,7 @@ def train(epochs): #TODO once data loader is complete
 			x_org, _ = pad_seq(datai[2])
 			uttr_org =  torch.from_numpy(x_org[np.newaxis, :, :]).cpu().float()
 			emb_org = torch.from_numpy(datai[1][np.newaxis, :]).cpu().float()
-			print(emb_org)
 			emb_trg = torch.from_numpy(dataj[1][np.newaxis, :]).cpu().float()
-			print(emb_trg)
 			#use i's content and j's style
 
 			mels, mel_postnet, _ = G(uttr_org, emb_org, emb_trg)
@@ -104,7 +103,6 @@ def train(epochs): #TODO once data loader is complete
 			uttr_trg0 = mels[0, 0, :, :].cpu()
 
 			uttr_trg  = uttr_trg[np.newaxis, :].cpu().float()
-			return
 			uttr_trg0 = uttr_trg0[np.newaxis, :].cpu().float()
 			content_org = Variable(torch.cat(G.encoder(uttr_org, emb_org)), requires_grad=True) #It's a list of tensors 
 			content_trg = Variable(torch.cat(G.encoder(uttr_trg, emb_org)), requires_grad=True)		
@@ -117,10 +115,10 @@ def train(epochs): #TODO once data loader is complete
 
 			l_recon = lrecon(uttr_org, uttr_trg)
 			l_content = lcontent(content_org, content_trg)
-			l_recon0 = lrecon0(uttr_trg, uttr_trg0);
+			l_recon0 = lrecon0(uttr_trg, uttr_trg0)
 
 			#loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
-			loss = l_recon + l_content * lmbda + l_recon0 * mu;
+			loss = l_recon + l_content * lmb + l_recon0 * mu
 			
 			loss.backward()
 			optimizer.step()
