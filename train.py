@@ -67,13 +67,13 @@ def train(epochs): #TODO once data loader is complete
 
 			datai = datas.get_item(i)
 			dataj = datas.get_item(j)
-
-			x_org = datai[2]
 			
-			x_org, _ = pad_seq(x_org)
-			uttr_org =  torch.from_numpy(x_org[np.newaxis, :, :]).to(device).float()
-			emb_org = torch.from_numpy(datai[1][np.newaxis, :]).to(device).float()
-			emb_trg = torch.from_numpy(dataj[1][np.newaxis, :]).to(device).float()
+			x_org, _ = pad_seq(datai[2])
+			uttr_org =  torch.from_numpy(x_org[np.newaxis, :, :]).cpu().float()
+			emb_org = torch.from_numpy(datai[1][np.newaxis, :]).cpu().float()
+			print(emb_org)
+			emb_trg = torch.from_numpy(dataj[1][np.newaxis, :]).cpu().float()
+			print(emb_trg)
 			#use i's content and j's style
 
 			mels, mel_postnet, _ = G(uttr_org, emb_org, emb_trg)
@@ -81,8 +81,9 @@ def train(epochs): #TODO once data loader is complete
 			uttr_trg  = mel_postnet[0, 0, :, :].cpu()
 			uttr_trg0 = mels[0, 0, :, :].cpu()
 
-			uttr_trg  = uttr_trg[np.newaxis, :].to(device).float()
-			uttr_trg0 = uttr_trg0[np.newaxis, :].to(device).float()
+			uttr_trg  = uttr_trg[np.newaxis, :].cpu().float()
+			return
+			uttr_trg0 = uttr_trg0[np.newaxis, :].cpu().float()
 			content_org = Variable(torch.cat(G.encoder(uttr_org, emb_org)), requires_grad=True) #It's a list of tensors 
 			content_trg = Variable(torch.cat(G.encoder(uttr_trg, emb_org)), requires_grad=True)		
 
