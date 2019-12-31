@@ -12,7 +12,7 @@ from tqdm import tqdm
 wavs = []
 mels = []
 
-for i in range(1, 2000):
+for i in range(1, 9994):
 	wavs.append('./BZNSYP.rar/Wave/'+str(i).zfill(6)+'.wav')
 
 write_path = './'
@@ -27,9 +27,12 @@ for wav_path in tqdm(wavs):
 	out_dtype = np.float32
 
 	mel_spectrogram = audio.melspectrogram(wav).astype(np.float32).T
+	a = mel_spectrogram
+	result = np.zeros((256, 80))
+	result[:min(a.shape[0],256),:a.shape[1]] = a[:min(a.shape[0],256),:a.shape[1]]
 
-	mels.append((basename,mel_spectrogram))
+	mels.append((basename,result))
 
-with open(os.path.join(write_path,'test.pkl'),'wb') as handle:
+with open(os.path.join(write_path,'data.pkl'),'wb') as handle:
 	pickle.dump(mels, handle)
 
