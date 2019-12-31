@@ -2,6 +2,7 @@
 /data_loader/BZNSYP
 
 /data_loader/test.pkl
+/data_loader/data.pkl
 autovc.ckpt
 checkpoint_step001000000_ema.pth
 __pycache__/model_vc.cpython-36.pyc
