@@ -137,7 +137,7 @@ def train(epochs): #TODO once data loader is complete
 
 train(1000)
 
-		
+
 
 #TODO: 
 # 1. Data Loader - Wav File -> Turn into Mel-Spectrogram -> Turn Spectrogram into 

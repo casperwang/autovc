@@ -6,8 +6,10 @@ from torch.utils.data import Dataset, DataLoader
 
 class voiceDataset(Dataset):
     wav_folder = []
+
     def __init__(self):
         self.wav_folder = pickle.load(open('./data_loader/data.pkl', "rb"))
+    
     def __getitem__(self, index):
         item = dict()
         item['person'] = 'p001'
@@ -16,8 +18,9 @@ class voiceDataset(Dataset):
         item['style'] = torch.from_numpy(tmp).cpu().float()
         item['spectrogram'] = torch.from_numpy(self.wav_folder[index][1]).cpu().float()
         # item[0] 人名 : p001(用來train的data)
-        # item[1] Style : 還沒有 Style encoder
-        # item[2] melspectrogram : 256*80 的.wav頻譜圖
+        # item[1] style : 還沒有 Style encoder
+        # item[2] melspectrogram : (256, 80) 的.wav頻譜圖
         return item
+    
     def __len__(self):
         return len(self.wav_folder)
