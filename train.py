@@ -18,7 +18,7 @@ learning_rate = 0.001
 
 PATH = "./train_weights.ckpt" #To train
 device = 'cpu'
-G = Generator(64, 256, 512, 32).eval().to(device)
+G = Generator(64, 256, 512, 32).train().to(device)
 G = G.float() #Turns all weights into float weights
 
 lmb = 1
@@ -78,12 +78,12 @@ def pad_seq(x, base = 32):
 def train(epochs): #TODO once data loader is complete
 	#Load data -> zero gradients -> forward + backward + optimize -> perhaps print stats?
 	total_it = 0
-	datas = data.voiceDataset()
+	datas = data.voiceDataset(batch_size = 2, shuffle = True)
 	sz = len(datas)
 	print("Dataset Size : ", sz)
 	for epoch in range(epochs):
 		running_loss = 0
-		for it in tqdm(range(iters_per_epoch)):
+		for it in tqdm(len(datas)):
 			total_it = total_it + 1
 			i = np.random.randint(0, sz)
 			j = np.random.randint(0, sz)
