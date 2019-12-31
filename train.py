@@ -93,10 +93,9 @@ def train(epochs): #TODO once data loader is complete
 			datai = datas[i]
 			dataj = datas[j]
 			
-			x_org, _ = pad_seq(datai[2])
-			uttr_org =  torch.from_numpy(x_org[np.newaxis, :, :]).cpu().float()
-			emb_org = torch.from_numpy(datai[1][np.newaxis, :]).cpu().float()
-			emb_trg = torch.from_numpy(dataj[1][np.newaxis, :]).cpu().float()
+			uttr_org = datai[2]
+			emb_org = datai[1]
+			emb_trg = dataj[1]
 			#use i's content and j's style
 
 			mels, mel_postnet, _ = G(uttr_org, emb_org, emb_trg)
