@@ -1,12 +1,13 @@
 import pickle
 from sklearn import preprocessing
 import numpy as np
+from torch.utils.data import Dataset, DataLoader
 
-class Dataset:
+class voiceDataset(Dataset):
     wav_folder = []
     def __init__(self):
         self.wav_folder = pickle.load(open('./data_loader/test.pkl', "rb"))
-    def get_item(self, index):
+    def __getitem__(self, index):
         item = ['p001']
         tmp = np.zeros((256), dtype='float64')
         tmp[0] = 1
@@ -16,5 +17,5 @@ class Dataset:
         # item[1] Style : 還沒有 Style encoder
         # item[2] melspectrogram : 256*80 的.wav頻譜圖
         return item
-    def len(self):
+    def __len__(self):
         return len(self.wav_folder)

@@ -21,7 +21,6 @@ device = 'cpu'
 G = Generator(64, 256, 512, 32).eval().to(device)
 G = G.float() #Turns all weights into float weights
 
-
 lmb = 1
 mu = 1
 
@@ -35,12 +34,15 @@ G.load_state_dict(g_checkpoint['model'])
 optimizer = optim.Adam(G.parameters(), lr = learning_rate) #Not sure what the parameters do, just copying it
 # optimizer.load_state_dict(g_checkpoint['optimizer'])
 
+MSELoss = torch.nn.MSELoss()
+L1Loss  = torch.nn.L1Loss()
+
 class L_Recon(torch.nn.Module):
 	def __init__(self):
 		super(L_Recon, self).__init__()
 
 	def forward(self, conv, ori):
-		L_recon = torch.MSELoss(conv, ori)
+		L_recon = MSELoss(conv, ori)
 		L_recon = L_recon * L_recon #L_recon is norm squared
 		return L_recon #lambda = 1
 
@@ -49,7 +51,7 @@ class L_Content(torch.nn.Module):
 		super(L_Content, self).__init__()
 
 	def forward(self, convcont, oricont):
-		L_content = torch.L1Loss(convcont, oricont) #This has to be a tensor lol
+		L_content = L1Loss(convcont, oricont) #This has to be a tensor lol
 		return L_content #lambda = 1
 
 class L_Recon0(torch.nn.Module):
@@ -57,7 +59,7 @@ class L_Recon0(torch.nn.Module):
 		super(L_Recon0, self).__init__()
 
 	def forward(self, oriuttr, tgtuttr):
-		L_recon0 = torch.MSELoss(oriuttr, tgtuttr) #This has to be a tensor lol
+		L_recon0 = MSELoss(oriuttr, tgtuttr) #This has to be a tensor lol
 		return L_recon0 #lambda = 1
 
 
@@ -76,8 +78,8 @@ def pad_seq(x, base = 32):
 def train(epochs): #TODO once data loader is complete
 	#Load data -> zero gradients -> forward + backward + optimize -> perhaps print stats?
 	total_it = 0
-	datas = data.Dataset()
-	sz = datas.len()
+	datas = data.voiceDataset()
+	sz = len(datas)
 	print("Dataset Size : ", sz)
 	for epoch in range(epochs):
 		running_loss = 0
@@ -88,8 +90,8 @@ def train(epochs): #TODO once data loader is complete
 			while(i == j):
 				j = np.random.randint(0, sz)
 
-			datai = datas.get_item(i)
-			dataj = datas.get_item(j)
+			datai = datas[i]
+			dataj = datas[j]
 			
 			x_org, _ = pad_seq(datai[2])
 			uttr_org =  torch.from_numpy(x_org[np.newaxis, :, :]).cpu().float()
@@ -105,7 +107,7 @@ def train(epochs): #TODO once data loader is complete
 			uttr_trg  = uttr_trg[np.newaxis, :].cpu().float()
 			uttr_trg0 = uttr_trg0[np.newaxis, :].cpu().float()
 			content_org = Variable(torch.cat(G.encoder(uttr_org, emb_org)), requires_grad=True) #It's a list of tensors 
-			content_trg = Variable(torch.cat(G.encoder(uttr_trg, emb_org)), requires_grad=True)		
+			content_trg = Variable(torch.cat(G.encoder(uttr_trg, emb_org)), requires_grad=True)
 
 			uttr_org  = Variable(uttr_org , requires_grad=True)
 			uttr_trg  = Variable(uttr_trg , requires_grad=True)
@@ -119,7 +121,7 @@ def train(epochs): #TODO once data loader is complete
 
 			#loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
 			loss = l_recon + l_content * lmb + l_recon0 * mu
-			
+
 			loss.backward()
 			optimizer.step()
 			if(doWrite == True):
