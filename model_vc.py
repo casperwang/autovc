@@ -17,7 +17,6 @@ class LinearNorm(torch.nn.Module):
     def forward(self, x):
         return self.linear_layer(x)
 
-
 class ConvNorm(torch.nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size=1, stride=1,
                  padding=None, dilation=1, bias=True, w_init_gain='linear'):
@@ -37,7 +36,6 @@ class ConvNorm(torch.nn.Module):
     def forward(self, signal):
         conv_signal = self.conv(signal)
         return conv_signal
-
 
 class Encoder(nn.Module):
     """Encoder module:

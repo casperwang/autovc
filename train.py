@@ -33,7 +33,7 @@ g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(de
 G.load_state_dict(g_checkpoint['model'])
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
 optimizer = optim.Adam(G.parameters(), lr = learning_rate) #Not sure what the parameters do, just copying it
-# optimizer.load_state_dict(g_checkpoint['optimizer'])
+optimizer.load_state_dict(g_checkpoint['optimizer'])
 
 MSELoss = torch.nn.MSELoss()
 L1Loss  = torch.nn.L1Loss()
@@ -85,14 +85,12 @@ def train(epochs): #TODO once data loader is complete
 				writer.add_scalar("Loss", loss.item(), total_it)
 
 			running_loss += loss.item()
-
-		    if(i % 100 == 99):
-			    print("Epoch: " + (str)(epoch) + ", avg loss = " + (str)(running_loss / iters_per_epoch))
-		torch.save({
-			"epoch": epoch,
-			"model": G.state_dict(),
-			"optimizer": optimizer.state_dict()
-		}, PATH)
+			#if i % 50 == 25:
+			#	torch.save({
+			#    "epoch": epoch,
+			#    "model": G.state_dict(),
+			#    "optimizer": optimizer.state_dict()
+		    #    }, PATH)
 
 train(1000)
 
