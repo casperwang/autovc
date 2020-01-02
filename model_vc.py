@@ -3,6 +3,7 @@ import pdb
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+import pdb
 
 class LinearNorm(torch.nn.Module):
     def __init__(self, in_dim, out_dim, bias=True, w_init_gain='linear'):
@@ -215,6 +216,7 @@ class Generator(nn.Module):
         
         pdb.set_trace()
         encoder_outputs = torch.cat((code_exp, c_trg.unsqueeze(1).expand(-1,x.size(2),-1)), dim=-1)
+
         
         mel_outputs = self.decoder(encoder_outputs)
                 

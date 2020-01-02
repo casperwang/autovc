@@ -55,7 +55,6 @@ def train(epochs): #TODO once data loader is complete
 	for epoch in range(epochs):
 		running_loss = 0
 		for i, datai in tqdm(enumerate(dataset)):
-			pdb.set_trace()
 			total_it = total_it + 1
 
 
