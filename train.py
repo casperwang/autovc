@@ -13,6 +13,7 @@ from tqdm import tqdm
 import torch.functional as F
 import data_loader.dataLoader as data
 import pdb
+import atexit
 
 learning_rate = 0.001
 batch_size = 2
@@ -47,60 +48,66 @@ def pad_seq(x, base = 32):
 		
 
 def train(epochs): #TODO once data loader is complete
-	#Load data -> zero gradients -> forward + backward + optimize -> perhaps print stats?
-	total_it = 0
-	datas = data.voiceDataset()
-	dataset = torch.utils.data.DataLoader(datas, batch_size = batch_size, shuffle = True)
-	for epoch in range(epochs):
-		running_loss = 0
-		for i, datai in enumerate(tqdm(dataset)):
-			total_it = total_it + 1
-
-
-			uttr_org = datai["spectrogram"]
-			emb_trg = emb_org = datai["style"]
-			#use i's content and j's style
-
-			mels, mel_postnet, _ = G(uttr_org, emb_org, emb_trg)
-			
-
-			#print("Getting contents")
-			content_org = Variable(torch.cat(G.encoder(uttr_org, emb_org)), requires_grad=True) #It's a list of tensors 
-			#print("Getting content_trg")
-			content_trg = Variable(torch.cat(G.encoder(mel_postnet, emb_org)), requires_grad=True)
-
-
-			optimizer.zero_grad()
-
-			l_recon = MSELoss(uttr_org, mel_postnet)
-			l_content = L1Loss(content_org, content_trg)
-			l_recon0 = MSELoss(uttr_org, mels)
-
-			#loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
-			loss = l_recon + l_content * lmb + l_recon0 * mu
-
-			loss.backward()
-			optimizer.step()
-			if(doWrite == True):
-				writer.add_scalar("Loss", loss.item(), total_it)
-
-			running_loss += loss.item()
-			#if i % 50 == 25:
-			#	torch.save({
-			#    "epoch": epoch,
-			#    "model": G.state_dict(),
-			#    "optimizer": optimizer.state_dict()
-		    #    }, PATH)
-
+	try:
+		#Load data -> zero gradients -> forward + backward + optimize -> perhaps print stats?
+		total_it = 0
+		datas = data.voiceDataset()
+		dataset = torch.utils.data.DataLoader(datas, batch_size = batch_size, shuffle = True)
+		for epoch in range(epochs):
+			running_loss = 0
+			for i, datai in enumerate(tqdm(dataset)):
+				total_it = total_it + 1
+	
+	
+				uttr_org = datai["spectrogram"]
+				emb_trg = emb_org = datai["style"]
+				#use i's content and j's style
+	
+				mels, mel_postnet, _ = G(uttr_org, emb_org, emb_trg)
+				
+	
+				#print("Getting contents")
+				content_org = Variable(torch.cat(G.encoder(uttr_org, emb_org)), requires_grad=True) #It's a list of tensors 
+				#print("Getting content_trg")
+				content_trg = Variable(torch.cat(G.encoder(mel_postnet, emb_org)), requires_grad=True)
+	
+	
+				optimizer.zero_grad()
+	
+				l_recon = MSELoss(uttr_org, mel_postnet)
+				l_content = L1Loss(content_org, content_trg)
+				l_recon0 = MSELoss(uttr_org, mels)
+	
+				#loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
+				loss = l_recon + l_content * lmb + l_recon0 * mu
+	
+				loss.backward()
+				optimizer.step()
+				if(doWrite == True):
+					writer.add_scalar("Loss", loss.item(), total_it)
+	
+				running_loss += loss.item()
+				
+				if (i % 200 == 100):
+					print("Saving on epoch " + str(epoch))
+					torch.save({
+					"epoch": epoch,
+						"model": G.state_dict(),
+						"optimizer": optimizer.state_dict()
+						}, PATH)
+	except KeyboardInterrupt: #Saves model upon manual exit
+		print("Saving on exit")
+		torch.save({
+		"epoch": epoch,
+		"model": G.state_dict(),
+		"optimizer": optimizer.state_dict()
+		}, PATH)
 train(1000)
-
-
-
 #TODO: 
 # 1. Data Loader - Wav File -> Turn into Mel-Spectrogram -> Turn Spectrogram into 
-#    1) init 
+#	1) init 
 #	 2) getelemnt  
 # 2. Training: Connect the dots, add Loss function, see pytorch example for trainer 
-#    Build Model ->
-#    def criterion()... for loss function 
+#	Build Model ->
+#	def criterion()... for loss function 
 
