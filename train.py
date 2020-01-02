@@ -64,23 +64,18 @@ def train(epochs): #TODO once data loader is complete
 
 			mels, mel_postnet, _ = G(uttr_org, emb_org, emb_trg)
 			
-			uttr_trg  = mel_postnet[0, 0, :, :].cpu()
-			uttr_trg0 = mels[0, 0, :, :].cpu()
 
-			uttr_trg  = uttr_trg.cpu().float()
-			uttr_trg0 = uttr_trg0.cpu().float()
+			#print("Getting contents")
 			content_org = Variable(torch.cat(G.encoder(uttr_org, emb_org)), requires_grad=True) #It's a list of tensors 
-			content_trg = Variable(torch.cat(G.encoder(uttr_trg, emb_org)), requires_grad=True)
+			#print("Getting content_trg")
+			content_trg = Variable(torch.cat(G.encoder(mel_postnet, emb_org)), requires_grad=True)
 
-			uttr_org  = Variable(uttr_org , requires_grad=True)
-			uttr_trg  = Variable(uttr_trg , requires_grad=True)
-			uttr_trg0 = Variable(uttr_trg0, requires_grad=True)
 
 			optimizer.zero_grad()
 
-			l_recon = MSELoss(uttr_org, uttr_trg)
+			l_recon = MSELoss(uttr_org, mel_postnet)
 			l_content = L1Loss(content_org, content_trg)
-			l_recon0 = MSELoss(uttr_trg, uttr_trg0)
+			l_recon0 = MSELoss(uttr_org, mels)
 
 			#loss = criterion(uttr_trg, uttr_org, content_trg, content_org)
 			loss = l_recon + l_content * lmb + l_recon0 * mu
