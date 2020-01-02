@@ -29,8 +29,8 @@ doWrite = True #Turns on and off writing to TensorBoard
 
 writer = SummaryWriter()
 
-#g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(device)) #the file to train
-#G.load_state_dict(g_checkpoint['model'])
+g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(device)) #the file to train
+G.load_state_dict(g_checkpoint['model'])
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
 optimizer = optim.Adam(G.parameters(), lr = learning_rate) #Not sure what the parameters do, just copying it
 # optimizer.load_state_dict(g_checkpoint['optimizer'])
@@ -86,7 +86,8 @@ def train(epochs): #TODO once data loader is complete
 
 			running_loss += loss.item()
 
-		print("Epoch: " + (str)(epoch) + ", avg loss = " + (str)(running_loss / iters_per_epoch))
+		    if(i % 100 == 99):
+			    print("Epoch: " + (str)(epoch) + ", avg loss = " + (str)(running_loss / iters_per_epoch))
 		torch.save({
 			"epoch": epoch,
 			"model": G.state_dict(),
