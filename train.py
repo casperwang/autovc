@@ -14,7 +14,6 @@ import torch.functional as F
 import data_loader.dataLoader as data
 import pdb
 
-iters_per_epoch = 100
 learning_rate = 0.001
 batch_size = 2
 
@@ -54,7 +53,7 @@ def train(epochs): #TODO once data loader is complete
 	dataset = torch.utils.data.DataLoader(datas, batch_size = batch_size, shuffle = True)
 	for epoch in range(epochs):
 		running_loss = 0
-		for i, datai in tqdm(enumerate(dataset)):
+		for i, datai in enumerate(tqdm(dataset)):
 			total_it = total_it + 1
 
 
