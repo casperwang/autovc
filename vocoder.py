@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
-
-
 import torch
 import librosa
 import pickle
@@ -22,9 +19,5 @@ for spect in spect_vc:
     name = spect[0]
     c = spect[1]
     print(name)
-    waveform = wavegen(model, c=c)   
+    waveform = wavegen(model, c=c)
     librosa.output.write_wav(name+'.wav', waveform, sr=16000)
-
-
-
-# %%

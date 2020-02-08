@@ -9,6 +9,7 @@ class voiceDataset(Dataset):
 
     def __init__(self):
         self.wav_folder = pickle.load(open('./data_loader/data.pkl', "rb"))
+        np.random.shuffle(self.wav_folder)
     
     def __getitem__(self, index):
         item = dict()

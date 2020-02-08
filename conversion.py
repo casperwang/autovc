@@ -24,6 +24,7 @@ metadata = [data[0]]
 spect_vc = []
 
 for sbmt_i in metadata:
+    
     x_org = sbmt_i['spectrogram']
     
     uttr_org = x_org
