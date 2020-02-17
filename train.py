@@ -19,8 +19,8 @@ learning_rate = 0.0001
 batch_size = 32
 
 PATH = "./train_weights.ckpt" #To train
-device = 'cpu'
-G = Generator(32, 256, 512, 32).train().to(device)
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") #Uses GPU when available
+G = Generator(64, 256, 512, 32).train().to(device)
 G = G.float() #Turns all weights into float weights
 
 lmb = 1
