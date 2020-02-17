@@ -16,7 +16,7 @@ import pdb
 import atexit
 
 learning_rate = 0.0001
-batch_size = 2
+batch_size = 32
 
 PATH = "./train_weights.ckpt" #To train
 device = 'cpu'
@@ -90,11 +90,12 @@ def train(epochs): #TODO once data loader is complete
 					"optimizer": optimizer.state_dict()
 				}, PATH)
 train(1000)
-#TODO: 
-# 1. Data Loader - Wav File -> Turn into Mel-Spectrogram -> Turn Spectrogram into 
-#	1) init 
-#	 2) getelemnt  
-# 2. Training: Connect the dots, add Loss function, see pytorch example for trainer 
+
+#TODO:
+# 1. Data Loader - Wav File -> Turn into Mel-Spectrogram -> Turn Spectrogram into
+#	1) init
+#	2) getelemnt
+# 2. Training: Connect the dots, add Loss function, see pytorch example for trainer
 #	Build Model ->
-#	def criterion()... for loss function 
+#	def criterion()... for loss function
 

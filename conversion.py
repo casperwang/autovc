@@ -37,14 +37,10 @@ for sbmt_i in metadata:
         
         with torch.no_grad():
             _, x_identic_psnt, _ = G(uttr_org, emb_org, emb_trg)
-            
+        
         uttr_trg = x_identic_psnt[0, 0, :, :].cpu().numpy()
         
         spect_vc.append( ('{}x{}'.format(sbmt_i["person"], sbmt_j["person"]), uttr_trg) )
 
 with open('results.pkl', 'wb') as handle:
     pickle.dump(spect_vc, handle)
-
-
-
-# %%

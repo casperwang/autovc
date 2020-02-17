@@ -209,11 +209,11 @@ class Generator(nn.Module):
         
         tmp = []
         for code in codes:
-            tmp.append(code.unsqueeze(1).expand(-1,int(x.size(2)/len(codes)),-1))
+            tmp.append(code.unsqueeze(1).expand(-1,int(x.size(1)/len(codes)),-1))
         code_exp = torch.cat(tmp, dim=1)
         
         #pdb.set_trace()
-        encoder_outputs = torch.cat((code_exp, c_trg.unsqueeze(1).expand(-1,x.size(2),-1)), dim=-1)
+        encoder_outputs = torch.cat((code_exp, c_trg.unsqueeze(1).expand(-1,x.size(1),-1)), dim=-1)
 
         
         mel_outputs = self.decoder(encoder_outputs)

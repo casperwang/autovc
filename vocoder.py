@@ -7,7 +7,7 @@ import pickle
 from synthesis import build_model
 from synthesis import wavegen
 
-spect_vc = pickle.load(open('results.pkl', 'rb'))
+spect_vc = pickle.load(open('./data_loader/data.pkl', 'rb'))
 device = torch.device("cpu")
 model = build_model().to(device)
 checkpoint = torch.load("checkpoint_step001000000_ema.pth", map_location = torch.device(device)) #Using the pretrained WaveNet Vocoder 
