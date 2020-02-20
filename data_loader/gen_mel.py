@@ -10,7 +10,7 @@ import glob
 from tqdm import tqdm
 
 wavs = []
-wav_len = 64
+wav_len = 256
 mels = []
 
 wavs.append('000001.wav')

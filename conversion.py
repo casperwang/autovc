@@ -34,9 +34,13 @@ for sbmt_i in metadata:
     for sbmt_j in metadata:
         
         emb_trg = sbmt_j["style"][np.newaxis, :]
+
+        
+        tmp = np.zeros((256), dtype='float64')
+        tmp[0] = 1
         
         with torch.no_grad():
-            _, x_identic_psnt, _ = G(uttr_org, emb_org, emb_trg)
+            _, x_identic_psnt, _ = G(uttr_org, torch.from_numpy(tmp).cpu().float()[np.newaxis, :], emb_trg)
         
         uttr_trg = x_identic_psnt[0, 0, :, :].cpu().numpy()
         
