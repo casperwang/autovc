@@ -16,11 +16,11 @@ import pdb
 import atexit
 
 learning_rate = 0.0001
-batch_size = 32
+batch_size = 2
 
-PATH = "./train_weights.ckpt" #To train
+PATH = "./train_weights.ckpt" #Save to
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") #Uses GPU when available
-G = Generator(64, 256, 512, 32).train().to(device)
+G = Generator(32, 256, 512, 32).train().to(device)
 G = G.float() #Turns all weights into float weights
 
 lmb = 1
@@ -30,7 +30,7 @@ doWrite = True #Turns on and off writing to TensorBoard
 
 writer = SummaryWriter()
 
-g_checkpoint = torch.load("./train_weights.ckpt", map_location = torch.device(device)) #the file to train
+g_checkpoint = torch.load("./autovc.ckpt", map_location = torch.device(device)) #Load from
 G.load_state_dict(g_checkpoint['model'])
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
 optimizer = optim.Adam(G.parameters(), lr = learning_rate) #Not sure what the parameters do, just copying it
@@ -50,17 +50,21 @@ def train(epochs): #TODO once data loader is complete
 	total_it = 0
 	datas = data.voiceDataset()
 	dataset = torch.utils.data.DataLoader(datas, batch_size = batch_size, shuffle = True)
+	
 	for epoch in range(epochs):
 		running_loss = 0
+		
 		for i, datai in enumerate(tqdm(dataset)):
 			total_it = total_it + 1
-
+			
 			uttr_org = datai["spectrogram"]
 			emb_trg = emb_org = datai["style"]
 			#use i's content and j's style
 
-			mels, mel_postnet, _ = G(uttr_org, emb_org, emb_trg)
 
+			mels, mel_postnet, _ = G(uttr_org, emb_org, emb_trg)
+			mel_postnet = mel_postnet.squeeze(0)
+			#pdb.set_trace()
 			#print("Getting contents")
 			content_org = Variable(torch.cat(G.encoder(uttr_org, emb_org)), requires_grad=True) #It's a list of tensors 
 			#print("Getting content_trg")
@@ -82,13 +86,14 @@ def train(epochs): #TODO once data loader is complete
 
 			running_loss += loss.item()
 			
-			if (i % 200 == 100):
-				print("Saving on epoch " + str(epoch))
-				torch.save({
-					"epoch": epoch,
-					"model": G.state_dict(),
-					"optimizer": optimizer.state_dict()
-				}, PATH)
+		if (epoch % 5 == 4):
+			print("Saving on Epoch " + str(epoch))
+			torch.save({
+				"epoch": epoch,
+				"model": G.state_dict(),
+				"optimizer": optimizer.state_dict()
+			}, "./test_ckpt_{}epo.ckpt".format(epoch))
+		print("Avg loss = " + str(running_loss/4))
 train(1000)
 
 #TODO:
