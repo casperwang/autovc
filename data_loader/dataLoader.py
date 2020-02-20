@@ -2,17 +2,32 @@ import pickle
 from sklearn import preprocessing
 import numpy as np
 import torch
+from math import ceil
 from torch.utils.data import Dataset, DataLoader
+
+from resemblyzer import preprocess_wav, VoiceEncoder
+from itertools import groupby
+from pathlib import Path
+from tqdm import tqdm
+import matplotlib.pyplot as plt
+import numpy as np
+
+def pad_seq(x, base=32):
+    len_out = int(base * ceil(float(x.shape[0])/base))
+    len_pad = len_out - x.shape[0]
+    assert len_pad >= 0
+    return np.pad(x, ((0,len_pad),(0,0)), 'constant'), len_pad
 
 class voiceDataset(Dataset):
     wav_folder = []
 
     def __init__(self):
-        self.wav_folder = pickle.load(open('./data_loader/data.pkl', "rb"))
+        self.wav_folder = pickle.load(open('./metadata_given.pkl', "rb"))
         np.random.shuffle(self.wav_folder)
     
     def __getitem__(self, index):
         item = dict()
+<<<<<<< HEAD
         item['person'] = 'p001'
         tmp = np.zeros((256), dtype='float64')
         tmp = np.array([-2.92885415e-02,  1.67739280e-02,  6.42375797e-02,  5.12384847e-02,
@@ -81,6 +96,12 @@ class voiceDataset(Dataset):
         5.63065596e-02, -1.04957800e-02,  1.53429583e-02,  2.60114018e-02])
         item['style'] = torch.from_numpy(tmp).cpu().float()
         item['spectrogram'] = torch.from_numpy(self.wav_folder[index][1][np.newaxis, :, :]).cpu().float()
+=======
+        item['person'] = self.wav_folder[index][0]
+        item['style'] = torch.from_numpy(self.wav_folder[index][1])
+        item['spectrogram'], _ = pad_seq(self.wav_folder[index][2][:96, :]) #Crops so that every file is at most 96 long
+        item['spectrogram'] = torch.from_numpy(item['spectrogram'])
+>>>>>>> bf8639fcdc54569acc99420c80e9011be0d59882
         # person : p001(用來train的data)
         # style : 還沒有 Style encoder
         # spectrogram : (256, 80) 的.wav頻譜圖

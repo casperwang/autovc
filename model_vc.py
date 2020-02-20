@@ -220,8 +220,10 @@ class Generator(nn.Module):
                 
         mel_outputs_postnet = self.postnet(mel_outputs.transpose(2,1))
         mel_outputs_postnet = mel_outputs + mel_outputs_postnet.transpose(2,1)
-        
-        mel_outputs = mel_outputs.unsqueeze(1)
-        mel_outputs_postnet = mel_outputs_postnet.unsqueeze(1)
-        
+        #pdb.set_trace()
+        #print("About to print")
+        #mel_outputs = mel_outputs.unsqueeze(1) #Channel (I think?)
+        #mel_outputs_postnet = mel_outputs_postnet.unsqueeze(1) #Same as above 
+        #print("Currently in last line of model")
+        #pdb.set_trace()
         return mel_outputs, mel_outputs_postnet, torch.cat(codes, dim=-1)

@@ -2,6 +2,7 @@
 # coding: utf-8
 
 # In[ ]:
+#from resemblyzer import preprocess_wav, VoiceEncoder #Style encoder
 
 
 import os
@@ -22,6 +23,10 @@ data = datas.voiceDataset()
 metadata = [data[0]]
 
 spect_vc = []
+
+
+
+
 
 for sbmt_i in metadata:
     
