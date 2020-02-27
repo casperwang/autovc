@@ -35,6 +35,8 @@ G.load_state_dict(g_checkpoint['model'])
 #Will train from the same file every time, if you don't have yet make sure to just comment this out
 optimizer = optim.Adam(G.parameters(), lr = learning_rate) #Not sure what the parameters do, just copying it
 optimizer.load_state_dict(g_checkpoint['optimizer'])
+styleEncoder = VoiceEncoder()
+
 
 MSELoss = torch.nn.MSELoss()
 L1Loss  = torch.nn.L1Loss()
@@ -57,8 +59,8 @@ def train(epochs): #TODO once data loader is complete
 		for i, datai in enumerate(tqdm(dataset)):
 			total_it = total_it + 1
 			
-			uttr_org = datai["spectrogram"]
-			emb_trg = emb_org = datai["style"]
+			uttr_org = datai["spectrogram"] #is a numpy array
+			emb_trg = emb_org = datai["style"] 
 			#use i's content and j's style
 
 

@@ -30,8 +30,8 @@ class voiceDataset(Dataset):
         item = dict()
         idx = self.iter_folder[index][i]
         item['person'] = idx
-        item['style'] = torch.from_numpy(pad_seq(self.wav_folder[idx][self.iter_folder[index][j]][:96, :]))
-        item['content'], _ = torch.from_numpy(pad_seq(self.wav_folder[idx][self.iter_folder[index][k]][:96, :]))
+        item['style'], _ = pad_seq(self.wav_folder[idx][self.iter_folder[index][j]])
+        item['content'], _ = pad_seq(self.wav_folder[idx][self.iter_folder[index][k]])
         return item
     
     def __len__(self):

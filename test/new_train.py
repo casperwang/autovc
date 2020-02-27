@@ -39,6 +39,9 @@ optimizer = optim.Adam(G.parameters(), lr = learning_rate) #Not sure what the pa
 G.load_state_dict(g_checkpoint['model'])
 optimizer.load_state_dict(g_checkpoint['optimizer'])
 
+#Voice Encoder (Resemblyzer)
+styleEncoder = VoiceEncoder()
+
 #Init loss functions
 MSELoss = torch.nn.MSELoss()
 L1Loss  = torch.nn.L1Loss()
@@ -54,8 +57,23 @@ def train_one_epoch(model, dataset, save_path, current_iter, doWrite = True): #T
 	#dataset: 		a PyTorch DataLoader that can be enumerated
 	#save_path: 	where to save the training weights
 	#current_iter: 	what iteration it's currently on (running total)
-	#doWirite: 		whether to write to tensorboard or not 
+	#doWrite: 		whether to write to tensorboard or not 
 	for i, datai in enumerate(tqdm(dataset)):
-		current_iter = current_iter + 1
 		
+		#datai: B * C * T * F
+		current_iter = current_iter + 1
+
+		uttr_org  = preprocess_wav(datai["content"]) #nparray
+		uttr_tgt  = preprocess_wav(datai["style"]  ) #nparray
+
+		style_org = [] 
+		style_tgt = []
+
+		for uttr in datai["content"]:
+			style_org.append(styleEncoder.embed_utterance(preprocess_wav(uttr)))
+
+		for uttr in datai["style"]:
+			style_org.append(styleEncoder.embed_utterance(preprocess_wav(uttr)))
+
+
 
