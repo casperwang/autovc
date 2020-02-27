@@ -21,11 +21,14 @@ def pad_seq(x, base=32):
 class voiceDataset(Dataset):
     wav_folder = []
 
-    def __init__(self):
+    def __init__(self): #Generate all combinations and then
+                        #In __getitem__ get the ith combination
+        #Person: 225 ~ 376
+        #Utterance: (i, j) s.t. i != j
         self.wav_folder = pickle.load(open('./metadata_given.pkl', "rb"))
         np.random.shuffle(self.wav_folder)
     
-    def __getitem__(self, index):
+    def __getitem__(self, index): #Should iterate through all possible triples
         item = dict()
         item['person'] = self.wav_folder[index][0]
         item['style'] = torch.from_numpy(self.wav_folder[index][1])
