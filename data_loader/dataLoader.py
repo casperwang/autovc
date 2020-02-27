@@ -20,23 +20,18 @@ def pad_seq(x, base=32):
 
 class voiceDataset(Dataset):
     wav_folder = []
+    iter_folder = []
 
-    def __init__(self): #Generate all combinations and then
-                        #In __getitem__ get the ith combination
-        #Person: 225 ~ 376
-        #Utterance: (i, j) s.t. i != j
-        self.wav_folder = pickle.load(open('./metadata_given.pkl', "rb"))
-        np.random.shuffle(self.wav_folder)
+    def __init__(self):
+        self.iter_folder = pickle.load(open('./iters.pkl', "rb"))
+        self.wav_folder = pickle.load(open('./data.pkl', "rb"))
     
     def __getitem__(self, index): #Should iterate through all possible triples
         item = dict()
-        item['person'] = self.wav_folder[index][0]
-        item['style'] = torch.from_numpy(self.wav_folder[index][1])
-        item['spectrogram'], _ = pad_seq(self.wav_folder[index][2][:96, :]) #Crops so that every file is at most 96 long
-        item['spectrogram'] = torch.from_numpy(item['spectrogram'])
-        # person : p001(用來train的data)
-        # style : 還沒有 Style encoder
-        # spectrogram : (256, 80) 的.wav頻譜圖
+        idx = self.iter_folder[index][i]
+        item['person'] = idx
+        item['style'] = torch.from_numpy(pad_seq(self.wav_folder[idx][self.iter_folder[index][j]][:96, :]))
+        item['content'], _ = torch.from_numpy(pad_seq(self.wav_folder[idx][self.iter_folder[index][k]][:96, :]))
         return item
     
     def __len__(self):
