@@ -56,7 +56,8 @@ print("finish Dataset!!!")
 for person in mels.keys():
 	for j in range(1, len(mels[person])+1):
 		for k in range(1, len(mels[person])+1):
-			iters.append({i:person, j:j, k:k})
+			if j != k:
+				iters.append({i:person, j:j, k:k})
 
 with open(os.path.join(write_path,'iters.pkl'),'wb') as handle:
 	pickle.dump(iters, handle)

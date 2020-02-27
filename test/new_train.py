@@ -55,5 +55,7 @@ def train_one_epoch(model, dataset, save_path, current_iter, doWrite = True): #T
 	#save_path: 	where to save the training weights
 	#current_iter: 	what iteration it's currently on (running total)
 	#doWirite: 		whether to write to tensorboard or not 
-	for i, datai in 
+	for i, datai in enumerate(tqdm(dataset)):
+		current_iter = current_iter + 1
+		
 

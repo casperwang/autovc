@@ -35,4 +35,4 @@ class voiceDataset(Dataset):
         return item
     
     def __len__(self):
-        return len(self.wav_folder)
+        return len(self.iter_folder)
