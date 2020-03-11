@@ -13,3 +13,6 @@ train_weights.ckpt
 *.pyc
 /runs
 *.ckpt
+data_loader/iters.pkl
+data_loader/report.txt
+data_loader/gen_mel_tensorflowv2.py

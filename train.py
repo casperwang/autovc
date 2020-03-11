@@ -16,6 +16,8 @@ import pdb
 import atexit
 
 learning_rate = 0.0001
+
+
 batch_size = 2
 
 PATH = "./train_weights.ckpt" #Save to
