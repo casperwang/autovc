@@ -62,7 +62,7 @@ def train(epochs): #TODO once data loader is complete
 			total_it = total_it + 1
 			
 			uttr_org = datai["spectrogram"] #is a numpy array
-			emb_trg = emb_org = datai["style"] 
+			emb_trg = emb_org = datai["style"]
 			#use i's content and j's style
 
 
