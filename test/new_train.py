@@ -1,6 +1,5 @@
 import numpy as np
-from model_vc import Generator
-from styleencoder import StyleEncoder
+from new_model import Generator
 import torch.autograd as autograd
 from torch.autograd import Variable
 from resemblyzer import VoiceEncoder, preprocess_wav
@@ -8,7 +7,7 @@ from math import ceil
 from torch.utils.tensorboard import SummaryWriter
 import torch
 import torch.optim as optim
-import model_vc as models
+import new_model as models
 from tqdm import tqdm
 import torch.functional as F
 import data_loader.dataLoader as data
@@ -52,28 +51,77 @@ def pad_seq(x, base = 32):
 	assert len_pad >= 0
 	return np.pad(x, ((0, len_pad), (0, 0)), "constant"), len_pad
 
-def train_one_epoch(model, dataset, save_path, current_iter, doWrite = True): #Takes a PyTorch DataLoader as input and 
+def train_one_epoch(model, dataset, save_dir, current_iter, doWrite = True): #Takes a PyTorch DataLoader as input and 
 	#model: 		the model that you wish to train
 	#dataset: 		a PyTorch DataLoader that can be enumerated
-	#save_path: 	where to save the training weights
+	#save_dir: 		directory to save the training weights
 	#current_iter: 	what iteration it's currently on (running total)
 	#doWrite: 		whether to write to tensorboard or not 
+	running_loss = 0
 	for i, datai in enumerate(tqdm(dataset)):
-		
+
 		#datai: B * C * T * F
+
+		datai.squeeze(1) #Gets rid of Channel dimension
+
 		current_iter = current_iter + 1
 
-		uttr_org  = preprocess_wav(datai["content"]) #nparray
-		uttr_tgt  = preprocess_wav(datai["style"]  ) #nparray
-
-		style_org = [] 
-		style_tgt = []
+		uttr_org  = [] #
+		uttr_tgt  = [] #This and the above will be B * T * F
+		style_org = [] #
+		style_tgt = [] #This and the above will be B * 1 * dim_style
 
 		for uttr in datai["content"]:
 			style_org.append(styleEncoder.embed_utterance(preprocess_wav(uttr)))
+			uttr_org.append(preprocess_wav(uttr))
 
 		for uttr in datai["style"]:
-			style_org.append(styleEncoder.embed_utterance(preprocess_wav(uttr)))
+			style_trg.append(styleEncoder.embed_utterance(preprocess_wav(uttr)))
+			uttr_trg.append(preprocess_wav(uttr))
+
+		#Turn everything into PyTorch Tensors, and gives the outputs to device
+		uttr_org  = torch.from_numpy(uttr_org).to(device)
+		uttr_trg  = torch.from_numpy(uttr_trg).to(device)
+		style_org = torch.from_numpy(style_org).to(device)
+		style_trg = torch.from_numpy(style_trg).to(device)
 
 
+		mel_outputs, mel_outputs_postnet, codes = G(uttr_org, emb_org, emb_trg)
+		_, _, trg_codes = G(mel_outputs, emb_trg, uttr_org)
+		#mel_outputs: 			the output sans postnet
+		#mel_outputs_postnet: 	the above with postnet added
+		#codes:					encoder output	
 
+
+		#Again, get rid of channel dimension
+		mel_outputs.squeeze(1)
+		mel_outputs_postnet.squeeze(1)
+		codes.squeeze(1)
+
+		#Zero gradients
+		optimizer.zero_grad()
+		#Calculate Loss
+		L_Recon = MSELoss(mel_outputs_postnet, uttr_trg)
+		L_Recon0 = MSELoss(mel_outputs, uttr_trg)
+		L_Content = L1Loss(codes, trg_codes)
+
+		loss = L_Recon + mu * L_Recon0 + lmb * L_Content
+
+		loss.backward()
+		optimizer.step()
+
+		running_loss += loss.item()
+
+		if(doWrite == True):
+				writer.add_scalar("Loss", loss.item(), current_iter)
+
+		
+		if current_iter % 100 == 99:
+			torch.save({
+				"epoch": epoch,
+				"model": G.state_dict(),
+				"optimizer": optimizer.state_dict()
+			}, save_dir + "/test_ckpt_{}epo.ckpt".format(epoch))
+
+
+		return current_iter

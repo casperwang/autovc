@@ -86,8 +86,7 @@ class Encoder(nn.Module):
 		#       (B: batch size, C: channel, H: height, W: weight)
 		#       第三行是把這兩個input concatenate，變成真的input
 
-        x = x.squeeze(1) #Only one channel 
-             .transpose(2,1) #Was: time->frqs, now: frq->times
+        x = x.squeeze(1).transpose(2,1) #Only one channel so squeeze out Was: time->frqs, now: frq->times
         c_org = c_org.unsqueeze(-1).expand(-1, -1, x.size(-1)) #I think it's to make it fit the dimensions of x
         x = torch.cat((x, c_org), dim=1)
         
