@@ -25,13 +25,13 @@ class voiceDataset(Dataset):
         self.iter_folder = pickle.load(open('./iters.pkl', "rb"))
         self.wav_folder = pickle.load(open('./data.pkl', "rb"))
     
-    def __getitem__(self, index):
+    def __getitem__(self, index): #Should iterate through all possible triples
         item = dict()
         idx = self.iter_folder[index][i]
         item['person'] = idx
-        item['style'] = torch.from_numpy(pad_seq(self.wav_folder[idx][self.iter_folder[index][j]][:96, :]))
-        item['content'], _ = torch.from_numpy(pad_seq(self.wav_folder[idx][self.iter_folder[index][k]][:96, :]))
+        item['style'], _ = pad_seq(self.wav_folder[idx][self.iter_folder[index][j]])
+        item['content'], _ = pad_seq(self.wav_folder[idx][self.iter_folder[index][k]])
         return item
     
     def __len__(self):
-        return len(self.wav_folder)
+        return len(self.iter_folder)
