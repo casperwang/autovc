@@ -17,7 +17,7 @@ iters = []
 peoplecnt = 1 #Should be 20
 
 p = 0
-for i in range(225, 225 + peoplecnt):
+for i in range(225, 225 + people_cnt):
 	DIR = './VCTK/wav48/p'+str(i)
 	if os.path.isdir(DIR):
 		p += 1
@@ -61,4 +61,4 @@ for person in mels.keys():
 with open(os.path.join(write_path,'iters.pkl'),'wb') as handle:
 	pickle.dump(iters, handle)
 
-print("Finish All!!!")
+print("Finish 'iters.pkl' !!!")
