@@ -61,7 +61,6 @@ def train(epochs): #TODO once data loader is complete
 			emb_trg = emb_org = datai["style"]
 			#use i's content and j's style
 
-
 			mels, mel_postnet, _ = G(uttr_org, emb_org, emb_trg)
 			mel_postnet = mel_postnet.squeeze(0)
 			#pdb.set_trace()
@@ -85,7 +84,7 @@ def train(epochs): #TODO once data loader is complete
 				writer.add_scalar("Loss", loss.item(), total_it)
 
 			running_loss += loss.item()
-			
+
 		if (epoch % 5 == 4):
 			print("Saving on Epoch " + str(epoch))
 			torch.save({

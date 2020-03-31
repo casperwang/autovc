@@ -4,7 +4,6 @@ import numpy as np
 import torch
 from math import ceil
 from torch.utils.data import Dataset, DataLoader
-
 from resemblyzer import preprocess_wav, VoiceEncoder
 from itertools import groupby
 from pathlib import Path
@@ -21,7 +20,7 @@ def pad_seq(x, base=32):
 class voiceDataset(Dataset):
     wav_folder = []
     iter_folder = []
-
+    
     def __init__(self):
         self.iter_folder = pickle.load(open('./iters.pkl', "rb"))
         self.wav_folder = pickle.load(open('./data.pkl', "rb"))

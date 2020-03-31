@@ -13,7 +13,6 @@ model = build_model().to(device)
 checkpoint = torch.load("checkpoint_step001000000_ema.pth", map_location = torch.device(device)) #Using the pretrained WaveNet Vocoder 
 model.load_state_dict(checkpoint["state_dict"])
 
-
 for spect in spect_vc:
     name = spect[0]
     c = spect[1]
