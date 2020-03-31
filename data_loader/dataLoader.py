@@ -27,10 +27,10 @@ class voiceDataset(Dataset):
     
     def __getitem__(self, index): #Should iterate through all possible triples
         item = dict()
-        idx = self.iter_folder[index][i]
+        idx = self.iter_folder[index]['i']
         item['person'] = idx
-        item['style'], _ = pad_seq(self.wav_folder[idx][self.iter_folder[index][j]])
-        item['content'], _ = pad_seq(self.wav_folder[idx][self.iter_folder[index][k]])
+        item['style'], _ = pad_seq(self.wav_folder[idx][self.iter_folder[index]['j']])
+        item['content'], _ = pad_seq(self.wav_folder[idx][self.iter_folder[index]['k']])
         return item
     
     def __len__(self):

@@ -14,10 +14,10 @@ wav_len = 256
 mels = dict()
 people = dict()
 iters = []
-peoplecnt = 20
+people_cnt = 20
 
 p = 0
-for i in range(225, 225 + peoplecnt):
+for i in range(225, 225 + people_cnt):
 	DIR = './VCTK/wav48/p'+str(i)
 	if os.path.isdir(DIR):
 		p += 1
@@ -52,15 +52,15 @@ for wav_path in tqdm(wavs):
 with open(os.path.join(write_path,'data.pkl'),'wb') as handle:
 	pickle.dump(mels, handle)
 
-print("finish Dataset!!!")
+print("finish 'data.pkl' !!!")
 
 for person in mels.keys():
 	for j in range(1, len(mels[person])+1):
 		for k in range(1, len(mels[person])+1):
 			if j != k:
-				iters.append({i:person, j:j, k:k})
+				iters.append({'i':person, 'j':j, 'k':k})
 
 with open(os.path.join(write_path,'iters.pkl'),'wb') as handle:
 	pickle.dump(iters, handle)
 
-print("Finish All!!!")
+print("Finish 'iters.pkl' !!!")
