@@ -48,9 +48,9 @@ if __name__ == "__main__":
 	if(opts.mode == "train"):
 		G = G.train()
 		current_iter = 0
-		for i in range(opts.epochs):
+		for cur_epoch in range(opts.epochs):
 			#Put config as argument
-			current_iter = train_one_epoch(G, optimizer, dataset, device, save_dir, current_iter, opts.write)
+			current_iter = train_one_epoch(G, optimizer, dataset, device, save_dir, current_iter, cur_epoch, opts.write)
 	else:
 		print("All other modes other than train are not available")
 

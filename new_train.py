@@ -36,7 +36,7 @@ def pad_seq(x, base = 32):
 	assert len_pad >= 0
 	return np.pad(x, ((0, len_pad), (0, 0)), "constant"), len_pad
 
-def train_one_epoch(model, optimizer, dataset, device, save_dir, current_iter, doWrite = True): #Takes a PyTorch DataLoader as input and 
+def train_one_epoch(model, optimizer, dataset, device, save_dir, current_iter, current_epoch, doWrite = True): #Takes a PyTorch DataLoader as input and 
 	#model: 		the model that you wish to train
 	#optimizer:		the optimizer 
 	#dataset: 		a PyTorch DataLoader that can be enumerated
@@ -94,16 +94,9 @@ def train_one_epoch(model, optimizer, dataset, device, save_dir, current_iter, d
 		
 		if current_iter % 100 == 99:
 			torch.save({
-				"epoch": epoch,
+				"epoch": current_epoch,
 				"model": model.state_dict(),
 				"optimizer": optimizer.state_dict()
 			}, save_dir + "/test_ckpt_{}iters.ckpt".format(current_iter))
-			torch.save({
-				"epoch": epoch,
-				"model": model.state_dict(),
-				"optimizer": optimizer.state_dict()
-			}, save_dir + "/last.ckpt".format(epoch))
-
-
 
 	return current_iter
