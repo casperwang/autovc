@@ -97,6 +97,6 @@ def train_one_epoch(model, optimizer, dataset, device, save_dir, current_iter, c
 				"epoch": current_epoch,
 				"model": model.state_dict(),
 				"optimizer": optimizer.state_dict()
-			}, save_dir + "/test_ckpt_{}iters.ckpt".format(current_iter))
+			}, save_dir + "/last.ckpt".format(current_iter))
 
 	return current_iter
