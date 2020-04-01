@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Autovc</title>
+</head>
+<body>
+    <form action="/autovc/add/" enctype="multipart/form-data" method="post" style="margin:20px">
+        {% csrf_token %}
+        <h1>上傳音檔</h1><br>
+        <input type="text" name="user_name" placeholder="聲音來源"><br><br>
+        <input type="file" name="user_wav" class="btn"><br><br>
+        <input type="submit" value="提交" class="btn btn-primary">
+    </form>
+</body>
+</html>

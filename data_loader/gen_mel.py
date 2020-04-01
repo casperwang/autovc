@@ -14,7 +14,7 @@ wav_len = 256
 mels = dict()
 people = dict()
 iters = []
-peoplecnt = 1 #Should be 20
+peoplecnt = 20
 
 p = 0
 for i in range(225, 225 + people_cnt):
@@ -28,13 +28,14 @@ for i in range(225, 225 + people_cnt):
 		while f < wavs_sz:
 			if os.path.isfile(DIR+'/p'+str(i)+'_'+str(c).zfill(3)+'.wav'):
 				wavs.append(DIR+'/p'+str(i)+'_'+str(c).zfill(3)+'.wav')
-				f += 1 
+				f += 1
 			c += 1
 
 print("finish Checking File!!!")
 
 write_path = './'
 for wav_path in tqdm(wavs):
+
 	basename = os.path.basename(wav_path).split('.wav')[0]
 	idx = people[int(basename[-7:-4])]
 	wav = audio.load_wav(wav_path)
@@ -51,12 +52,13 @@ for wav_path in tqdm(wavs):
 with open(os.path.join(write_path,'data.pkl'),'wb') as handle:
 	pickle.dump(mels, handle)
 
+print("finish Dataset!!!")
+
 for person in mels.keys():
-	for j in range(0, len(mels[person])):
-		for k in range(0, len(mels[person])):
+	for j in range(1, len(mels[person])+1):
+		for k in range(1, len(mels[person])+1):
 			if j != k:
-				print("i = " + str(person) + ", j = " + str(j) + " k = " + str(k))
-				iters.append({"i":person, "j":j, "k":k})
+				iters.append({i:person, j:j, k:k})
 
 with open(os.path.join(write_path,'iters.pkl'),'wb') as handle:
 	pickle.dump(iters, handle)
